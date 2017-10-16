@@ -145,3 +145,10 @@ See http://rocketmq.apache.org/docs/faq/ for further details.
 	at org.apache.rocketmq.client.producer.DefaultMQProducer.send(DefaultMQProducer.java:212)
 	at org.apache.rock
 ```
+
+#### 问题
+2017-10-11 07:21:38 WARN SendMessageThread_1 - Offset for /root/store/commitlog/00000000002147483648 not matched. Request offset: 4051326754958557513, index: -521875234, mappedFileSize: 1073741824, mappedFiles count: 1
+2017-10-11 07:21:38 WARN SendMessageThread_1 - findMappedFileByOffset failure. 
+java.lang.ArrayIndexOutOfBoundsException: -521875234
+
+请教：rocketmq的这个异常应该如何解决呢？
