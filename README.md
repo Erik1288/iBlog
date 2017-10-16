@@ -1,7 +1,38 @@
 # Erik1288.github.io
 
-hexo g -d 
+``` bash
+$ npm -v
+5.4.2
 
+$ hexo -v
+hexo: 3.3.9
+hexo-cli: 1.0.3
+os: Darwin 16.0.0 darwin x64
+http_parser: 2.7.0
+node: 8.5.0
+v8: 6.0.287.53
+uv: 1.14.1
+zlib: 1.2.11
+ares: 1.10.1-DEV
+modules: 57
+nghttp2: 1.25.0
+openssl: 1.0.2l
+icu: 59.1
+unicode: 9.0
+cldr: 31.0.1
+tz: 2017b
+```
+
+### 初始化项目
+npm install
+
+### 启动本地预览
+hexo s
+
+### 发布
+hexo clean && hexo g -d
+
+### 本地高清图片插入
 
 First
 
