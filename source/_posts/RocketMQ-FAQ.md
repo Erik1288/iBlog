@@ -152,5 +152,3 @@ See http://rocketmq.apache.org/docs/faq/ for further details.
 java.lang.ArrayIndexOutOfBoundsException: -521875234
 
 请教：rocketmq的这个异常应该如何解决呢？
-
-test
