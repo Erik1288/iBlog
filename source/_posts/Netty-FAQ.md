@@ -24,6 +24,8 @@ ByteToMessageDecoder与LengthFieldBasedFrameDecoder的区别
 如果用的Intellij，就能实现这个效果，首先用debug模式启动netty server。在debug tag下，我们进入Threads，展开**Thread Group "main"**，发现**boss-event-loop**正在处于Running状态。选中**boss-event-loop**，右键点击**suspend**，之后就能看到代码停了下来，去**Frames**tab中选择某一行进行断点调试。
 
 ### 聊天程序
-Web Socket技术````
+Web Socket技术
 Long Pooling技术
+
+### 原生NIO可能会被问到的问题
 
