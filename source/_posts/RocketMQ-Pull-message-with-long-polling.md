@@ -1,5 +1,5 @@
 ---
-title: RocketMQ——高性能PullRequest秘籍之长轮询原理分析
+title: RocketMQ——高性能PullRequest秘籍之长轮询(长轮询)原理分析
 date: 2017-09-19 16:58:52
 tags: RocketMQ
 ---
