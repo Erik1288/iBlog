@@ -1,7 +1,7 @@
 ---
 title: Cobar-FAQ
 date: 2017-10-18 20:24:04
-tags:
+tags: Cobar
 ---
 
 1. FrontendConnection默认的NioHandler是FrontendAuthenticator, 当认证信息发来时，FrontendConnection会把handler.handle()任务放入一个线程池中，当前的handler是默认的认证器，如果认证成功了，FrontendAuthenticator会反过来将FrontendConnection的handler替换成FrontendCommandHandler。
