@@ -31,6 +31,7 @@ Long Pooling技术
 
 ### Netty线程管理，高低水位线(watermark)控制
 https://stackoverflow.com/questions/25281124/netty-4-high-and-low-write-watermarks
+http://adolgarev.blogspot.ru/2013/12/pipelining-and-flow-control.html?view=flipcard
 
 ### Netty线程模型，Netty异常对Inbound(入站)和Outbound(出站) Handler的影响
 
