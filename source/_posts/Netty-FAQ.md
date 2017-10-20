@@ -29,3 +29,15 @@ Long Pooling技术
 
 ### 原生NIO可能会被问到的问题
 
+### Netty线程管理，高低水位线(watermark)控制
+https://stackoverflow.com/questions/25281124/netty-4-high-and-low-write-watermarks
+
+### Netty线程模型，Netty异常对Inbound(入站)和Outbound(出站) Handler的影响
+
+### Netty内存管理，怎么防止内存过度使用
+
+io模型，上面图里的问题，内存池怎么管理，怎么防止泄露。
+mq主从切换，但是网络原因master假死， 这时候slave升级为主，怎么办？
+和mysql主从切换一个道理，我不知道怎么办。或者怎么屏蔽。
+
+
