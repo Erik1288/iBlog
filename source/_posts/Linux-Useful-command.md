@@ -42,3 +42,11 @@ ss  -tan|awk 'NR>1{++S[$1]}END{for (a in S) print a,S[a]}'
 ``` bash
 du -sh logs/*
 ```
+
+#### 将需要交互的命令的结果重定向到文件中
+
+``` bash
+telnet zk_ip 2181 | tee -a  -i someFile
+
+envi
+```
