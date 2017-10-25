@@ -67,7 +67,7 @@ protected void doRegister() throws Exception {
     }
 }
 ```
-注意到，register的第二个参数为0，也就是说，selector和channel之间仅仅有了
+注意到，register的第二个参数为0，也就是说，selector和serverSocketChannel之间仅仅有了注册关系，但没有指定selector到底interest什么事件，那问题是，selector和serverSocketChannel之间的OP_ACCEPT是什么时候完成的？
 
 
 
