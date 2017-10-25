@@ -1,5 +1,5 @@
 ---
-title: Netty-FAQ
+title: Netty-原理整理
 date: 2017-10-16 14:25:04
 tags:
 ---
@@ -40,5 +40,34 @@ http://adolgarev.blogspot.ru/2013/12/pipelining-and-flow-control.html?view=flipc
 io模型，上面图里的问题，内存池怎么管理，怎么防止泄露。
 mq主从切换，但是网络原因master假死， 这时候slave升级为主，怎么办？
 和mysql主从切换一个道理，我不知道怎么办。或者怎么屏蔽。
+
+
+### Netty bind()方法
+
+``` java
+@Override
+protected void doRegister() throws Exception {
+    boolean selected = false;
+    for (;;) {
+        try {
+            selectionKey = javaChannel().register(eventLoop().unwrappedSelector(), 0, this);
+            return;
+        } catch (CancelledKeyException e) {
+            if (!selected) {
+                // Force the Selector to select now as the "canceled" SelectionKey may still be
+                // cached and not removed because no Select.select(..) operation was called yet.
+                eventLoop().selectNow();
+                selected = true;
+            } else {
+                // We forced a select operation on the selector before but the SelectionKey is still cached
+                // for whatever reason. JDK bug ?
+                throw e;
+            }
+        }
+    }
+}
+```
+注意到，register的第二个参数为0，也就是说，selector和channel之间仅仅有了
+
 
 
