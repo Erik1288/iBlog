@@ -10,6 +10,7 @@ tags: RocketMQ
 ### 物理Offset队列: CommitLog
 
 ### MappedByteBuffer
+
 操纵MappedByteBuffer的线程或者进程必须对某一个文件的映射Buffer有独占权，
 在设计上，消息的顺序是由CommitLog决定，所以CommitLog在Append新的消息时，必须上锁进行互斥。
 

@@ -5,6 +5,6 @@ tags:
 ---
 
 
-![你想输入的替代文字](Cobar-Reactor-design-pattern/CobarReactorSign.gif)
+![](Cobar-Reactor-design-pattern/CobarReactorSign.gif)
 
-![你想输入的替代文字](Cobar-Reactor-design-pattern/CobarReactor.gif)
+![](Cobar-Reactor-design-pattern/CobarReactor.gif)

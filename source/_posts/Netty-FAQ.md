@@ -9,6 +9,10 @@ ByteToMessageDecoder与LengthFieldBasedFrameDecoder的区别
 
 ### 重要概念 Future and Promise
 
+### Netty处理的对象
+
+bytes and messages.
+
 ### 如何调试时间循环线程
 当我们用debug启动netty server时，我们不知道boss线程运行的代码，那怎么样才能发现boss线程当前的执行轨迹呢。如果能找到轨迹，对我们研究boss线程有非常大的帮助。
 
