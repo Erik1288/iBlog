@@ -10,3 +10,5 @@ Handler是由NioConnection主动触发的，在Handler处理完信息后，需�
 
 Cobar将数据库连接池的大小暴露在配置文件中，但为了性能考虑（我觉得），没有严格将数据库的连接数保持在这个范围内，假设连接池的大小为50，在高并发的SQL执行下，连接数可能会冲击到80-90，此时需要注意MySQL的max_connections这个配置，如果这个值比较小，那Cobar在并发执行SQL时创建连接，而MySQL握手包的内容可能会发生变化，但Cobar不会处理这种异常情况，导致Cobar抛出一下错误：
 ![img](https://ws4.sinaimg.cn/large/006tKfTcgy1fkmo3ieklej31kw0hz7il.jpg)
+
+### Cobar怎么处理半包和拆包

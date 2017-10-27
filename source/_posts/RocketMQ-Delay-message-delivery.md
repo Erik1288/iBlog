@@ -6,6 +6,27 @@ tags: RocketMQ
 
 ### 被动延时消费
 
+``` java
+consumer.registerMessageListener(new MessageListenerConcurrently() {
+    @Override
+    public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs,
+        ConsumeConcurrentlyContext context) {
+        // 可能抛出异常
+        boolean success = doConsume(msgs);
+        
+        if (success) {
+            return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+        } else {
+            return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+        }
+    }
+});
+```
+
 ### 主动延时消费
+
+``` java
+
+```
 
 ### 分布式事务之 Best Effort Delivery
