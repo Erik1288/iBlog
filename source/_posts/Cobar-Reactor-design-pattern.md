@@ -13,7 +13,6 @@ tags: Cobar
 
 ![](Cobar-Reactor-design-pattern/NioRegister.gif)
 
-
 ### Cobar NIO Server线程模型
 
 ![](Cobar-Reactor-design-pattern/CobarReactor.gif)
