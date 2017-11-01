@@ -11,3 +11,5 @@ tags: THread
 
 
 ### Promise
+
+### Difference between ReentrantLock and sync
