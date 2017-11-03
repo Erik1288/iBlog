@@ -6,3 +6,5 @@ tags: RocketMQ
 
 
 https://help.aliyun.com/document_detail/43348.html?spm=5176.doc43490.6.566.Zd5Bl7
+
+![你想输入的替代文字](RocketMQ-Transactional-message/transaction_rocketmq.gif)
