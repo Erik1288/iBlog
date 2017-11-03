@@ -7,6 +7,8 @@ tags: RocketMQ
 
 #### RocmetMQ的IndexService设计原理
 
+![你想输入的替代文字](RocketMQ-Index-service/index-file.gif)
+
 在RocketMQ中，IndexService底层是通过文件来存储的，所以，即使MQ的进程在中途重启过，索引的功能是不受影响的。
 索引文件的路径是 `System.getProperty("user.home") + File.separator + "store"`，文件名是文件创建的时间，可以有多个，但，
 在一个文件没有满的情况下，所有的topic的所有的列队的消息，全部都是顺序得存放在一个文件中的，这很重要，下面会详解。
