@@ -160,3 +160,7 @@ java.lang.ArrayIndexOutOfBoundsException: -521875234
 
 #### RocketMQ 业务KEY相同导致哈希冲突
 
+#### RocketMQ协议
+
+RocketMQ LengthBasedField
+
