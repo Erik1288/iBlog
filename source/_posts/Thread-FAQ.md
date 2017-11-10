@@ -19,6 +19,10 @@ tags: THread
 
 如果用了ReentrantLock，还需要设置自旋锁么？
 
+假如用sync做了线程互斥，A和B两个线程竞争monitor，A拿到了monitor，如果A迟迟不释放，B将永远等待，怎么避免这种情况？
+
+CopyOnWrite
+
 15个Java多线程面试题及回答
 
 1)现在有T1、T2、T3三个线程，你怎样保证T2在T1执行完后执行，T3在T2执行完后执行？

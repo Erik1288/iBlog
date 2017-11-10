@@ -33,7 +33,7 @@ Long Pooling技术
 
 ### 原生NIO可能会被问到的问题
 
-### Netty线程管理，高低水位线(watermark)控制
+### Netty线程管理，高低水位线(watermark)控制，高低水位指的是线程
 https://stackoverflow.com/questions/25281124/netty-4-high-and-low-write-watermarks
 http://adolgarev.blogspot.ru/2013/12/pipelining-and-flow-control.html?view=flipcard
 
@@ -73,5 +73,6 @@ protected void doRegister() throws Exception {
 ```
 注意到，register的第二个参数为0，也就是说，selector和serverSocketChannel之间仅仅有了注册关系，但没有指定selector到底interest什么事件，那问题是，selector和serverSocketChannel之间的OP_ACCEPT是什么时候完成的？
 
+### 用sendBuf和RecBuf做系统之间的限流，这好像是一个天然的事情
 
 

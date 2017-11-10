@@ -36,7 +36,7 @@ case ResponseCode.PULL_NOT_FOUND:
 ```
 那么，消息刷入CommitLog后，怎么样让这个Hold住的PullRequest感知到消息的到来？
 答案是，DefaultMessageStore.ReputMessageService线程。
-ReputMessageService开启时就进行了一个近实时的空循环，
+ReputMessageService开启时就进行了一个近实时的空循环(Busy Spin)，不释放CPU进行等待事件
 ``` java
 while (!this.isStopped()) {
     try {
