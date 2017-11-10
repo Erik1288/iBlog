@@ -23,3 +23,8 @@ tags: RocketMQ
 #### Spin Lock(自旋锁)
 
 #### ReentrantLock(重入锁)
+
+
+### 异步刷盘机制
+
+http://blog.csdn.net/vonzhoufz/article/details/47248777

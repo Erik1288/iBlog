@@ -5,3 +5,7 @@ tags: JVM
 ---
 
 http://www.cnblogs.com/aigongsi/archive/2012/04/01/2429166.html
+
+### MVCC Copy on write
+
+CopyOnWriteArrayList实现细节
