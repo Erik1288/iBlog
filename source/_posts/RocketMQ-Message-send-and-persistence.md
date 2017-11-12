@@ -5,6 +5,35 @@ tags: RocketMQ
 ---
 
 
+### 异步刷盘有两种方式
+
+``` java
+// Synchronization flush
+if (FlushDiskType.SYNC_FLUSH == this.defaultMessageStore.getMessageStoreConfig().getFlushDiskType()) {
+    final GroupCommitService service = (GroupCommitService) this.flushCommitLogService;
+}
+// Asynchronous flush
+else {
+    if (!this.defaultMessageStore.getMessageStoreConfig().isTransientStorePoolEnable()) {
+        // FlushRealTimeService
+        flushCommitLogService.wakeup();
+    } else {
+        // CommitRealTimeService
+        commitLogService.wakeup();
+    }
+}
+```
+
+``` java
+public boolean isTransientStorePoolEnable() {
+    return transientStorePoolEnable && FlushDiskType.ASYNC_FLUSH == getFlushDiskType()
+        && BrokerRole.SLAVE != getBrokerRole();
+}
+```
+
+transientStorePoolEnable的具体含义是什么？
+FlushRealTimeService和CommitRealTimeService刷盘的方式有什么区别，在性能有什么区别？
+
 ![你想输入的替代文字](RocketMQ-Message-send-and-persistence/disc-fall.gif)
 
 ### 逻辑Offset队列: ConsumerQueue
@@ -28,3 +57,64 @@ tags: RocketMQ
 ### 异步刷盘机制
 
 http://blog.csdn.net/vonzhoufz/article/details/47248777
+
+#### 磁盘顺序读写与随机读写的差异
+
+https://kafka.apache.org/documentation/#design_filesystem
+
+http://blog.csdn.net/evankaka/article/details/48464013
+
+需要好好研究：http://blog.csdn.net/javahongxi/article/details/72956619?locationNum=2&fps=1
+虽然讲的是kafka，研究价值极高：http://blog.csdn.net/tototuzuoquan/article/details/73437890
+pagecache是一个现在操作系统带有的天然的缓存！！！！！
+
+
+如何查看内存的 PAGESIZE
+``` bash
+getconf PAGESIZE
+```
+
+终于理解了！！！！ 首先，Kafka重度依赖底层操作系统提供的PageCache功能。当上层有写操作时，操作系统只是将数据写入PageCache，同时标记Page属性为Dirty。当读操作发生时，先从PageCache中查找，如果发生缺页才进行磁盘调度，最终返回需要的数据。实际上PageCache是把尽可能多的空闲内存都当做了磁盘缓存来使用。同时如果有其他进程申请内存，回收PageCache的代价又很小，所以现代的OS都支持PageCache。 
+
+所以说 commit(atLeastSize)的参数就是现代操作系统pagecache的大小。
+
+
+http://www.jianshu.com/p/6494e33c9b1f
+Consume Queue 顺序写，顺序读 几乎都是完全命中Page Cache，和内存速度几乎一样
+Commit Log 顺序写，顺序跳跃读，相比完全的随机读，性能也还好
+
+http://blog.csdn.net/mg0832058/article/details/5890688
+内存映射文件原理探索
+
+
+http://www.jianshu.com/p/6494e33c9b1f
+1).充分利用page cache降低读数据的时间开销. 读取时尽可能让其命中page cache, 减少IO读操作, 所以内存越大越好. 如果系统中堆积的消息过多, 读数据要访问磁盘会不会由于随机读导致系统性能急剧下降, 答案是否定的.
+访问page cache 时, 即使只访问1k的消息, 系统也会提前预读出更多数据, 在下次读时, 就可能命中内存.
+随机访问Commit Log磁盘数据, 系统IO调度算法设置为NOOP方式, 会在一定程度上将完全的随机读变成顺序跳跃方式, 而顺序跳跃方式读较完全的随机读性能会高5倍以上.
+另外4k的消息在完全随机访问情况下, 仍然可以达到8K次每秒以上的读性能.
+由于Consume Queue存储数据量极少, 而且是顺序读, 在PAGECACHE预读作用下, Consume Queue的读性能几乎与内存一致, 即使堆积情况下. 所以可认为Consume Queue完全不会阻碍读性能.
+2).Commit Log中存储了所有的元信息, 包含消息体, 类似于Mysql、Oracle的redolog, 所以只要有Commit Log在, Consume Queue即使数据丢失, 仍然可以恢复出来.
+
+https://segmentfault.com/a/1190000003985468
+kafka底层原理
+
+
+
+linux最多可以容忍多少大小的脏页。脏页－linux内核中的概念，因为硬盘的读写速度远赶不上内存的速度，系统就把读写比较频繁的数据事先放到内存中，以提高读写速度，这就叫高速缓存，linux是以页作为高速缓存的单位，当进程修改了高速缓存里的数据时，该页就被内核标记为脏页，内核将会在合适的时间把脏页的数据写到磁盘中去，以保持高速缓存中的数据和磁盘中的数据是一致的。
+
+### 问题
+
+page cache是内存的东西（物理内存还是虚拟内存），我们写文件时先写进内存page cache，然后从page cache刷到disc上
+
+现在MQ异步刷盘是有个间隔的，如果说pagecache中的数据一直没有被刷进磁盘，那所谓的脏页会越来越大，jvm crash后会丢失数据么。那什么时候是不会丢消息的
+
+对于读是好理解的，但对于写，如果文件是顺序写的，commit log和consume queue都是顺序写的，那pagecache的存在如何让速度提升了？是从java heap到pagecache的速度提升了，还是说从pagecache到disc的速度提升了？
+
+producer发送消息，如果是立马被消费这种场景
+1.对于consume queue，肯定是顺序读写，所以写进pagecache（物理内存）后，直接就从pagecache（物理内存）被读出来了
+2.对于commit log，虽然不是顺序读，但也是基本有序读，最后大部分也能命中pagecache，不需要走系统IO
+
+如果是消费历史消息，很大程度上，会发现在pagecache（虚拟内存）中没有，由系统产生缺页中断，从磁盘中重新读到pagecache中（可能还会根据顺序预读很多），然后再将数据从pagecache复制到socket中传输到consumer。
+
+MappedByteBuffer 能不能映射大于操作系统内存的文件
+MappedByteBuffer所占用的内存是堆外内存，那什么时候才能被回收

@@ -6,6 +6,10 @@ tags: JVM
 
 http://blog.csdn.net/matt8/article/details/52298397
 
+https://www.ibm.com/developerworks/cn/java/j-lo-jvm-optimize-experience/index.html#icomments
+
+https://www.ibm.com/developerworks/cn/java/j-lo-JVMGarbageCollection/#icomments
+
 Java ReentrantLock（重入锁）带来的改变
 
 
@@ -55,3 +59,6 @@ public class Buffer {
 ```
 
 接着，我们来定义2个线程，一个线程去写，一个线程去读。
+
+http://www.importnew.com/15311.html
+G1垃圾回收
