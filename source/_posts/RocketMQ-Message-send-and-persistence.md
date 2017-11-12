@@ -68,6 +68,9 @@ http://blog.csdn.net/evankaka/article/details/48464013
 虽然讲的是kafka，研究价值极高：http://blog.csdn.net/tototuzuoquan/article/details/73437890
 pagecache是一个现在操作系统带有的天然的缓存！！！！！
 
+http://blog.csdn.net/mg0832058/article/details/5890688
+内存映射文件原理探索
+
 
 如何查看内存的 PAGESIZE
 ``` bash
@@ -118,3 +121,54 @@ producer发送消息，如果是立马被消费这种场景
 
 MappedByteBuffer 能不能映射大于操作系统内存的文件
 MappedByteBuffer所占用的内存是堆外内存，那什么时候才能被回收
+
+http://www.iocoder.cn/RocketMQ/message-store/
+CommitRealTimeService	异步刷盘 && 开启内存字节缓冲区	第一
+FlushRealTimeService	异步刷盘 && 关闭内存字节缓冲区	第二
+GroupCommitService	同步刷盘	第三
+没看懂
+
+http://blog.csdn.net/iie_libi/article/details/54289580
+零拷贝技术
+
+Consumer 消费消息过程，使用了零拷贝技术，因为有小块数据传输的需求，效果会比 sendfile 更好，所以RocketMQ选择了mmap+write方式。
+① 优点：即使频繁调用，使用小块文件传输，效率也很高
+② 缺点：不能很好的利用 DMA 方式，会比 sendfile 多消耗CPU，内存安全性控制复杂，需要避免JVM Crash问题。
+
+文件系统
+
+建议选择ext4文件系统，删除文件的实时性强。
+调优：文件系统的io调度算法需要调整为deadline，因为deadline 算法在随机读情况下，可以合并读请求为顺序跳跃方式，从而提高读IO 吞吐量。
+
+文件读写冲突？
+
+写文件的时候，如果消费者在读怎么办？
+依赖于操作系统对文件读写操作的处理，，，永远一个一个进程在写文件，如果其他进程需要访问文件，只能是读，或者是再创建一个副本，写文件。（读写锁+写时复制） 读写锁在哪里
+
+提高pagecache？
+
+  想要提高pagecache的命中率，即尽量让访问的页在物理内存中，而不是在虚拟内存中，减少IO 读操作，所以从硬件的角度，当然是内存越大越好。
+而在软件角度，rocketmq有以下策略：
+尽量顺序读
+ 如果需要随机读的话：
+访问 PAGECACHE 时，即使只访问 1k 的消息，系统也会提前预读出更多数据，在下次读时，就可能命中内存。
+ 随机访问 Commit Log 磁盘数据，系统 IO 调度算法设置为NOOP 方式，会在一定程度上将完全的随机读变成顺序跳跃方式，而顺序跳跃方式读较完全的随机读性能会高5 倍以上。
+ 
+ 可能的优化策略
+ 
+ 1．线程绑定核+线程池（取模）
+ a) 将每个线程绑定核，一个函数就可以
+ b) 优势：避免线程核间调度
+ 2．改用互斥锁为读写锁
+ a) 读读场景的线程可以并行
+ 3．使用xxhash代替crc算法，性能可以提高很多
+ a) 参考链接：https://cyan4973.github.io/xxHash/
+ 4．使用topic划分多个逻辑队列（链表）
+ a) 避免topic的多次字符串的比较
+ 5．改用STL的deque来替代MESA list
+ a) Deque类似于vector，可以支持随机访问
+ b) 常量时间内在头部和尾部插入，删除元素
+ 6．改用跳表来代替MESA list
+ a) 跳表可以高并发+log（n）的随机访问
+ b) 不能删除元素 
+ i. 设为标志位，当内存数据达到一定阈值时，写到磁盘或者持久化到leveldb中（hbase也是这样做的）。
