@@ -1,11 +1,11 @@
 ---
-title: Kafka-High-performance-design-with-pagecache
+title: Kafka——高速低延时之秘诀「Page Cache」
 date: 2017-11-12 22:47:44
 tags: Kafka
 ---
 
 
-在开始所有的分析之前，有几段文章一定要先读一读
+> 一切的秘密，都在下面的几篇文章中
 
 http://blog.csdn.net/tototuzuoquan/article/details/73437890
 
@@ -57,3 +57,7 @@ sendfile() copies data between one file descriptor and another.
 Because this copying is done within the kernel, sendfile() is more
 efficient than the combination of read(2) and write(2), which would
 require transferring data to and from user space.
+
+![你想输入的替代文字](Kafka-High-performance-design-with-pagecache/read_write.gif)
+
+conventional read and write
