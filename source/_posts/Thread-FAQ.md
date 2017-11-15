@@ -4,6 +4,9 @@ date: 2017-10-27 11:07:35
 tags: THread
 ---
 
+http://blog.csdn.net/zhandoushi1982/article/details/5506597
+线程的挂起操作实质上就是使线程进入“非可执行”状态下，在这个状态下CPU不会分给线程时间片，进入这个状态可以用来暂停一个线程的运行。在线程挂起后，可以通过重新唤醒线程来使之恢复运行。
+
 ### ThreadLocal
 
 

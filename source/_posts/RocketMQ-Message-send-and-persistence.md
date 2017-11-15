@@ -119,7 +119,7 @@ producer发送消息，如果是立马被消费这种场景
 
 如果是消费历史消息，很大程度上，会发现在pagecache（虚拟内存）中没有，由系统产生缺页中断，从磁盘中重新读到pagecache中（可能还会根据顺序预读很多），然后再将数据从pagecache复制到socket中传输到consumer。
 
-MappedByteBuffer 能不能映射大于操作系统内存的文件
+MappedByteBuffer 能不能映射大于操作系统内存的文件？
 MappedByteBuffer所占用的内存是堆外内存，那什么时候才能被回收
 
 http://www.iocoder.cn/RocketMQ/message-store/
@@ -147,6 +147,46 @@ Consumer 消费消息过程，使用了零拷贝技术，因为有小块数据�
 
 提高pagecache？
 
+RocketMQ用的是FileChannel.map()出来的MappedByteBuffer，这种Buffer是堆外内存，MQ怎么对这部分的内存进行回收？
+``` java
+public static void clean(final ByteBuffer buffer) {
+    if (buffer == null || !buffer.isDirect() || buffer.capacity() == 0)
+        return;
+    invoke(invoke(viewed(buffer), "cleaner"), "clean");
+}
+```
+
+``` java
+private static class Deallocator
+        implements Runnable {
+    private static Unsafe unsafe = Unsafe.getUnsafe();
+
+    private long address;
+    private long size;
+    private int capacity;
+
+    private Deallocator(long address, long size, int capacity) {
+        assert (address != 0);
+        this.address = address;
+        this.size = size;
+        this.capacity = capacity;
+    }
+
+    public void run() {
+        if (address == 0) {
+            // Paranoia
+            return;
+        }
+        unsafe.freeMemory(address);
+        address = 0;
+        Bits.unreserveMemory(size, capacity);
+    }
+
+}
+```
+
+堆外内存的回收需要依赖显式Full GC或者隐式Full GC，一般来说DisableExplicitGC可以开，也可以关，但是如果禁用了显式GC，当系统没有足够的Full GC时，堆外内存无法回收。
+
   想要提高pagecache的命中率，即尽量让访问的页在物理内存中，而不是在虚拟内存中，减少IO 读操作，所以从硬件的角度，当然是内存越大越好。
 而在软件角度，rocketmq有以下策略：
 尽量顺序读
@@ -172,3 +212,19 @@ Consumer 消费消息过程，使用了零拷贝技术，因为有小块数据�
  a) 跳表可以高并发+log（n）的随机访问
  b) 不能删除元素 
  i. 设为标志位，当内存数据达到一定阈值时，写到磁盘或者持久化到leveldb中（hbase也是这样做的）。
+ 
+ _java.nio.channels.FileChannel_
+ `public abstract void force(boolean metaData) throws java.io.IOException`
+ Forces any updates to this channel's file to be written to the storage device that contains it.
+ If this channel's file resides on a local storage device then when this method returns it is guaranteed that all changes made to the file since this channel was created, or since this method was last invoked, will have been written to that device. This is useful for ensuring that critical information is not lost in the event of a system crash.
+ If the file does not reside on a local device then no such guarantee is made.
+ The metaData parameter can be used to limit the number of I/O operations that this method is required to perform. Passing false for this parameter indicates that only updates to the file's content need be written to storage; passing true indicates that updates to both the file's content and metadata must be written, which generally requires at least one more I/O operation. Whether this parameter actually has any effect is dependent upon the underlying operating system and is therefore unspecified.
+ Invoking this method may cause an I/O operation to occur even if the channel was only opened for reading. Some operating systems, for example, maintain a last-access time as part of a file's metadata, and this time is updated whenever the file is read. Whether or not this is actually done is system-dependent and is therefore unspecified.
+ This method is only guaranteed to force changes that were made to this channel's file via the methods defined in this class. **It may or may not force changes that were made by modifying the content of a mapped byte buffer obtained by invoking the map method. Invoking the force method of the mapped byte buffer will force changes made to the buffer's content to be written.**
+ 
+ _java.nio.MappedByteBuffer_
+ `public final MappedByteBuffer force()`
+ Forces any changes made to this buffer's content to be written to the storage device containing the mapped file.
+ If the file mapped into this buffer resides on a local storage device then when this method returns it is guaranteed that all changes made to the buffer since it was created, or since this method was last invoked, will have been written to that device.
+ If the file does not reside on a local device then no such guarantee is made.
+ If this buffer was not mapped in read/write mode (java.nio.channels.FileChannel.MapMode.READ_WRITE) then invoking this method has no effect.
