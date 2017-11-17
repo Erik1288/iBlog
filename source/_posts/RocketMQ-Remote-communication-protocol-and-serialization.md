@@ -1,5 +1,5 @@
 ---
-title: RocketMQ-Remote-communication-protocol-and-serialization
+title: RocketMQ——远程通讯协议及其序列化
 date: 2017-11-10 18:41:47
 tags: RocketMQ
 ---

@@ -166,3 +166,5 @@ RocketMQ LengthBasedField
 
 #### MQ系统限流和Flow Control
 
+#### RocketMQ的NameServer是不是支持分布式一致性
+
