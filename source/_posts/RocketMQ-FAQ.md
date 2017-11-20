@@ -168,3 +168,5 @@ RocketMQ LengthBasedField
 
 #### RocketMQ的NameServer是不是支持分布式一致性
 
+#### 现在这个版本，当Master挂掉时，Slave可以升级成新的Master么
+

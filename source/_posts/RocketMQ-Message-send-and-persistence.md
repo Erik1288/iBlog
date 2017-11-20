@@ -228,3 +228,32 @@ private static class Deallocator
  If the file mapped into this buffer resides on a local storage device then when this method returns it is guaranteed that all changes made to the buffer since it was created, or since this method was last invoked, will have been written to that device.
  If the file does not reside on a local device then no such guarantee is made.
  If this buffer was not mapped in read/write mode (java.nio.channels.FileChannel.MapMode.READ_WRITE) then invoking this method has no effect.
+ 
+ 
+ ### 写得超级好的一篇文章
+ 
+ http://blog.csdn.net/a417930422/article/details/52585862
+
+包括下面的问题：
+
+wangbin00162017-08-08 17:011楼
+楼主确定 零拷贝-sendfile 对应到java中
+为FileChannel.transferTo(long position, long count, WritableByteChannel target)//？？
+
+rocketmq 文档上面写到 RocketMQ选择了第一种方式，mmap+write方式，因为有小块数据传输的需求，效果会比sendfile更好。
+
+源码里面使用的是netty的FileRegion 用的是FileChannel.transferTo
+
+FileRegion fileRegion =
+new ManyMessageTransfer(response.encodeHeader(getMessageResult.getBufferTotalSize()), getMessageResult);
+channel.writeAndFlush(fileRegion)
+            回复  2条回复
+             a417930422
+            a4179304222017-09-21 10:35
+            回复wangbin0016：另外，rocketmq主要使用的是mmap，即java的MappedByteBuffer用于快速读写。
+             a417930422
+            a4179304222017-09-21 10:32
+            回复wangbin0016：rocketmq文档中写的是Consumer 消费消息过程使用了mmap+write，即内存映射文件的方式，请参照我写的rocketmq存储相关文章：http://blog.csdn.net/a417930422/article/details/52585180.
+            你说的netty的FileRegion其实是被rocketmq重新实现的ManyMessageTransfer，而transfer过程其实是将GetMessageResult对象的数据写到netty的channel中，本质是从内核获取数据直接发送至socket，不会复制到用户空间。
+            GetMessageResult其实是mmap的一个子缓冲区而已。
+            有兴趣可以看看源码 com.alibaba.rocketmq.store.DefaultMessageStore.getMessage方法
