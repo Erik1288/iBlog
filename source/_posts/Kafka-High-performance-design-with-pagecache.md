@@ -12,6 +12,8 @@ http://blog.csdn.net/tototuzuoquan/article/details/73437890
 http://www.jianshu.com/p/eba0067b1e1a
 大神作者
 
+https://tech.meituan.com/kafka-fs-design-theory.html
+
 
 _java.nio.channels.FileChannel_
 `public abstract void force(boolean metaData) throws java.io.IOException`
