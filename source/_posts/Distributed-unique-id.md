@@ -151,3 +151,7 @@ public class SnowflakeIdWorker {
     }
 }
 ```
+
+### baidu uid-generator
+
+https://github.com/baidu/uid-generator
