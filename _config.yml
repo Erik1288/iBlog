@@ -3,9 +3,9 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 艾瑞克笔记
+title: 艾瑞克小记
 subtitle:
-description: 费红健的原创笔记 <br> 能用代码或者作图来说明问题，绝不废话
+description: 费红健的笔记 <br> 能用代码或者作图来说明问题，绝不废话
 author: Eric Fei
 language: zh-Hans
 timezone:
@@ -81,3 +81,10 @@ deploy:
   type: git
   repo: git@github.com:Erik1288/Erik1288.github.io.git
   branch: master
+
+# search
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
