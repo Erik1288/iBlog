@@ -50,3 +50,9 @@ telnet zk_ip 2181 | tee -a  -i someFile
 
 envi
 ```
+
+#### 查看上下文切换
+
+``` bash
+nmon
+```
