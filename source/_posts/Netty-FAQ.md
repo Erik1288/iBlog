@@ -75,4 +75,12 @@ protected void doRegister() throws Exception {
 
 ### 用sendBuf和RecBuf做系统之间的限流，这好像是一个天然的事情
 
+### Netty高性能开发备忘录
+http://blog.csdn.net/asdfayw/article/details/71730543
 
+### Netty中的那些坑
+http://www.jianshu.com/p/890525ff73cb
+http://www.jianshu.com/p/8f22675d71ac
+
+### 用Netty开发中间件：高并发性能优化
+http://blog.csdn.net/dc_726/article/details/48978891
