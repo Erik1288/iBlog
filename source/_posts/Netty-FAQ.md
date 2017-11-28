@@ -37,6 +37,8 @@ Long Pooling技术
 https://stackoverflow.com/questions/25281124/netty-4-high-and-low-write-watermarks
 http://adolgarev.blogspot.ru/2013/12/pipelining-and-flow-control.html?view=flipcard
 
+看下这个文章，是不是可以用Netty的限流来完成这个事情
+
 ### Netty线程模型，Netty异常对Inbound(入站)和Outbound(出站) Handler的影响
 
 ### Netty内存管理，怎么防止内存过度使用
