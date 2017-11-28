@@ -4,6 +4,83 @@ date: 2017-10-27 11:07:35
 tags: THread
 ---
 
+
+### TODO hexo new Thread-Poolize-thread
+
+```
+假如有一个工厂，工厂里面有10个工人，每个工人同时只能做一件任务。
+
+　　因此只要当10个工人中有工人是空闲的，来了任务就分配给空闲的工人做；
+
+　　当10个工人都有任务在做时，如果还来了任务，就把任务进行排队等待；
+
+　　如果说新任务数目增长的速度远远大于工人做任务的速度，那么此时工厂主管可能会想补救措施，比如重新招4个临时工人进来；
+
+　　然后就将任务也分配给这4个临时工人做；
+
+　　如果说着14个工人做任务的速度还是不够，此时工厂主管可能就要考虑不再接收新的任务或者抛弃前面的一些任务了。
+
+　　当这14个工人当中有人空闲时，而新任务增长的速度又比较缓慢，工厂主管可能就考虑辞掉4个临时工了，只保持原来的10个工人，毕竟请额外的工人是要花钱的。
+```
+
+
+### Executor里面的线程是怎么被复用的？
+
+``` java
+final void runWorker(Worker w) {
+    Thread wt = Thread.currentThread();
+    Runnable task = w.firstTask;
+    w.firstTask = null;
+    w.unlock(); // allow interrupts
+    boolean completedAbruptly = true;
+    try {
+        while (task != null || (task = getTask()) != null) {
+            w.lock();
+            // If pool is stopping, ensure thread is interrupted;
+            // if not, ensure thread is not interrupted.  This
+            // requires a recheck in second case to deal with
+            // shutdownNow race while clearing interrupt
+            if ((runStateAtLeast(ctl.get(), STOP) ||
+                 (Thread.interrupted() &&
+                  runStateAtLeast(ctl.get(), STOP))) &&
+                !wt.isInterrupted())
+                wt.interrupt();
+            try {
+                beforeExecute(wt, task);
+                Throwable thrown = null;
+                try {
+                    task.run();
+                } catch (RuntimeException x) {
+                    thrown = x; throw x;
+                } catch (Error x) {
+                    thrown = x; throw x;
+                } catch (Throwable x) {
+                    thrown = x; throw new Error(x);
+                } finally {
+                    afterExecute(task, thrown);
+                }
+            } finally {
+                task = null;
+                w.completedTasks++;
+                w.unlock();
+            }
+        }
+        completedAbruptly = false;
+    } finally {
+        processWorkerExit(w, completedAbruptly);
+    }
+}
+```
+
+### 问题，ExecutorService的submit和execute有什么区别
+
+
+
+
+
+
+
+
 http://blog.csdn.net/zhandoushi1982/article/details/5506597
 线程的挂起操作实质上就是使线程进入“非可执行”状态下，在这个状态下CPU不会分给线程时间片，进入这个状态可以用来暂停一个线程的运行。在线程挂起后，可以通过重新唤醒线程来使之恢复运行。
 
@@ -16,6 +93,12 @@ http://blog.csdn.net/zhandoushi1982/article/details/5506597
 ### Promise
 
 ### Difference between ReentrantLock and sync
+
+### join
+
+### yield
+
+### fork
 
 
 ### Java线程面试题

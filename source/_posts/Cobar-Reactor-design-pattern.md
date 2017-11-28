@@ -33,5 +33,8 @@ http://www.dre.vanderbilt.edu/~schmidt/PDF/reactor-siemens.pdf
 
 ![](Cobar-Reactor-design-pattern/CobarReactor.gif)
 
+### Cobar的整个模型非常像 Fork/Join
+Forks and Joins: When a job arrives at a fork point, it is split into N sub-jobs which are then serviced by n tasks. After being serviced, each sub-job waits until all other sub-jobs are done processing. Then, they are joined again and leave the system. Thus, in parallel programming, we require synchronization as all the parallel processes wait for several other processes to occur.
+
 
 

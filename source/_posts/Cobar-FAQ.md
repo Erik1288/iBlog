@@ -12,3 +12,10 @@ Cobar将数据库连接池的大小暴露在配置文件中，但为了性能考
 ![img](https://ws4.sinaimg.cn/large/006tKfTcgy1fkmo3ieklej31kw0hz7il.jpg)
 
 ### Cobar怎么处理半包和拆包
+
+
+
+### hexo new Cobar-Extend-Database
+
+Percona XtraBackup
+分片数不能变，非常简单得扩容
