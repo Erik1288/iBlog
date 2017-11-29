@@ -1,9 +1,8 @@
 ---
 title: Cobar-Enhance-cobar-mysql-heartbeat
 date: 2017-10-27 14:37:10
-tags:
+tags: Cobar
 ---
-
 
 ### Cobar与MySQL心跳实现
 

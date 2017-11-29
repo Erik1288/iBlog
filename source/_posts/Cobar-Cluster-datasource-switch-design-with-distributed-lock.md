@@ -20,4 +20,10 @@ CobarA和CobarB初始启动后，后端的数据源都指向MySQL1-4。如果Cob
 
 ### 问题
 
-Cobar_B上执行insert，Cobar_A上执行select，binlog需要时间
+Cobar_B上执行insert，Cobar_A上执行select，binlog如果出现延迟，那数据就会短期内查不出来。
+
+### 改进
+
+![](Cobar-Cluster-datasource-switch-design-with-distributed-lock/datasource-swithch-with-zk-event-sender.gif)
+
+![](Cobar-Cluster-datasource-switch-design-with-distributed-lock/zk-distributed-lock.gif)

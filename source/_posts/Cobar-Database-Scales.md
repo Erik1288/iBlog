@@ -1,5 +1,5 @@
 ---
-title: Cobar-Database-Scales
+title: Cobar——数据库扩容
 date: 2017-11-29 15:49:07
 tags: Cobar
 ---
