@@ -1,7 +1,7 @@
 ---
-title: Distributed-unique-id
+title: 分布式唯一ID
 date: 2017-11-08 14:39:03
-tags:
+tags: 分布式设计
 ---
 
 
@@ -155,3 +155,5 @@ public class SnowflakeIdWorker {
 ### baidu uid-generator
 
 https://github.com/baidu/uid-generator
+
+### 怎么解决由于
