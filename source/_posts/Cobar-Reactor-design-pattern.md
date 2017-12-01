@@ -8,7 +8,7 @@ tags: Cobar
 
 不急，我们先看例子:
 
-假设一个班上有5个老师，其中一个为主考官，让3000个学生现场画一张图，在画图之前有时间思考，但不能动笔，等到作画有灵感了，举手向老师示意，老师来现场看你作画。
+假设一个班上有5个老师，其中一个为主考官，让3000个学生现场画一幅图，然后给每个学生一个分数。学生在画图之前有时间思考，但不能动笔，等到作画有灵感了，举手向老师示意，老师来现场看你作画。
 
 你有下面几个选择：
 
@@ -40,6 +40,11 @@ tags: Cobar
 #### Cobar的整个模型非常像 Fork/Join
 Forks and Joins: When a job arrives at a fork point, it is split into N sub-jobs which are then serviced by n tasks. After being serviced, each sub-job waits until all other sub-jobs are done processing. Then, they are joined again and leave the system. Thus, in parallel programming, we require synchronization as all the parallel processes wait for several other processes to occur.
 
+
+### 如何深刻理解reactor和proactor？
+
+reactor：能收了你跟俺说一声。
+proactor: 你给我收十个字节，收好了跟俺说一声。
 
 Refer:
 http://www.dre.vanderbilt.edu/~schmidt/PDF/reactor-siemens.pdf
