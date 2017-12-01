@@ -71,3 +71,8 @@ listenPort=22222
 完整的Store目录结构截图
 
 ![](https://ws1.sinaimg.cn/large/006tKfTcgy1fkedpuigp8j317e1a80zy.jpg)
+
+技巧
+
+1. 充分利用作者写好的单元测试，对原理的掌握会有帮助
+2. RocketMQ有太多的事情是用 （短时间）定时+唤醒 的方式异步执行的，想要更好得了解原理，最好把定时的时间改得大一点，这样多线程的调试会好做很多。

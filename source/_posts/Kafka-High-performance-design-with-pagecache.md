@@ -63,3 +63,15 @@ require transferring data to and from user space.
 ![你想输入的替代文字](Kafka-High-performance-design-with-pagecache/read_write.gif)
 
 conventional read and write
+
+
+关于脏页，有什么需要注意的？
+
+http://blog.csdn.net/stark_summer/article/details/50144591
+
+Tips
+1. Kafka官方并不建议通过Broker端的log.flush.interval.messages和log.flush.interval.ms来强制写盘，认为数据的可靠性应该通过Replica来保证，而强制Flush数据到磁盘会对整体性能产生影响。
+2. 可以通过调整/proc/sys/vm/dirty_background_ratio和/proc/sys/vm/dirty_ratio来调优性能。
+a. 脏页率超过第一个指标会启动pdflush开始Flush Dirty PageCache。
+b. 脏页率超过第二个指标会阻塞所有的写操作来进行Flush。
+c. 根据不同的业务需求可以适当的降低dirty_background_ratio和提高dirty_ratio。

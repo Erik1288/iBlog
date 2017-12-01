@@ -8,11 +8,14 @@ tags: RocketMQ
 
 ### 为什么RocketMQ性能很高？
 
-主要是消息存储的方式影响着性能。
+主要还是得益于存储模型，利用磁盘顺序读写性能远高于随机读写的特性。
 
 ### MQ为什么内部要使用好多队列？
 
-理论上队列入口要加锁（要么是程序的锁，要么是文件的锁）来保证同步，如果队列非常多，虽然不能把锁去掉，但可以减小并发线程对锁的竞争。这个是以前的结论，但实际情况是，consume queue只有一个线程来做。首先，commit log文件只有一个，假如要执行sendMessage，一定要用sync或者自旋锁（之后的版本为了考虑性能），消息都是顺序写进commit log的。对于一个topic的某一个consumer group，consumerQueue文件就有很多个，写consumerQueue文件由一个ReputMessageService的线程近实时空转而触发，也是单个线程。从写consumerQueue文件（send message）的角度来分析，多个队列是没有好处的。如果从读consumerQueue文件（pull message）的角度来分析。
+1. send性能
+理论上队列入口要加锁（要么是程序的锁，要么是文件的锁）来保证同步，如果队列非常多，虽然不能把锁去掉，但可以减小并发线程对锁的竞争。这个是以前的结论，但实际情况是，consume queue只有一个线程来做。首先，commit log文件只有一个，假如要执行sendMessage，一定要用sync或者自旋锁（之后的版本为了考虑性能），消息都是顺序写进commit log的。对于一个topic的某一个consumer group，consumerQueue文件就有很多个，写consumerQueue文件由一个ReputMessageService的线程近实时空转而触发，也是单个线程。从写consumerQueue文件（send message）的角度来分析，多个队列是没有好处的。
+2. consume性能
+如果从读consumerQueue文件（pull message）的角度来分析，那确实是可以提高并行度。
 
 ### MQ的NameServer集群节点中间有没有同步数据？与Zookeeper集群的区别是什么？
 
@@ -49,12 +52,8 @@ RebalanceServer生成 PullRequest 会调用PullMessageService 放入 PullRequest
 
 ### 为什么一旦有producer发送了消息，consumer会几乎无延迟得立刻收到消息？
 
-首先网络层，和基于事件编程的Netty有关。跟网络有关，网络收到数据后，立刻进入回调代码。ReputService空轮询有关。
-
-技巧
-
-1. 充分利用作者写好的单元测试，对原理的掌握会有帮助
-2. RocketMQ有太多的事情是用 （短时间）定时+唤醒 的方式异步执行的，想要更好得了解原理，最好把定时的时间改得大一点，这样多线程的调试会好做很多。
+1. consumer长轮询，在没有消息时hold在server端。
+2. commit log的max offset增大，触发空轮询ReputMessageService，构建完consume queue之后，调用messageArrivingListener通知消息到了，从而重新processRequest来pull消息。
 
 未解决问题：
 
@@ -100,9 +99,15 @@ RebalanceServer生成 PullRequest 会调用PullMessageService 放入 PullRequest
 
 ### 如果发送了某个topic的某个tag的消息，那订阅了该topic的consumer是有可能过滤掉该tag的信息的。那怎么样才能知道该消息是“订阅了，被过滤了”的状态呢？
 
+首先，根据queueId和consume offset可以判断出当前消息是不是已经被
+
 ### ConsumerQueue文件删除了，能够复原么？原理
 
+可以
+
 ### index file删除了，能够复原么？原理
+
+可以
 
 ### ReputMessageService中空转监听是Commitog的offset，当有新的消息时，先是构建consume queue，然后通知PullMessageHoldService，那整个过程在哪里对消息进行过滤，过滤用的是tag，consume queue中也有tag的hash，是不是只需要对比这两个值就好？
 5. 如果一个4G的文件用mmap映射到Java的MappedByteBuffer中，是绝对不可能整体加载进内存的。一个ByteBuffer就是一个有限的byte数组，但是，我们理论上可以在这个数组的任何位置（position）对数组进行读和写，然后映射进文件。如果OS能预感到我们的文件是顺序读写的，那么内存到文件的速度会非常快，如果是随机的，OS没法预测下次的读写位置，这样速度会变慢（这部分去查询下）

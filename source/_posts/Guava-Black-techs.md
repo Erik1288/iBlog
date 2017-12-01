@@ -6,6 +6,8 @@ tags: Guava
 
 ### 限流
 
+http://www.itwendao.com/article/detail/357611.html
+
 ### 缓存
 
 ### 集合
