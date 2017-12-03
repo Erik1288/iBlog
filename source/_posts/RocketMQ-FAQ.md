@@ -182,5 +182,10 @@ RocketMQ LengthBasedField
 
 在公司遇到一种情况，就是不断消费失败
 
+### RocketMQ到底用的是poll,epoll,还是其它的东西？？？？？？
+http://www.jianshu.com/p/7835726dc78b?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation
+
+http://www.jianshu.com/p/5ab57182af89?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation
+
 
 
