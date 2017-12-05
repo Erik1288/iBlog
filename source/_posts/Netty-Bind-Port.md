@@ -189,3 +189,5 @@ runAllTasks();指的是除了IO的任务
 
 ioTime / (n + ioTime) = ioRatio / (100)
 => n = ioTime * (100 - ioRatio) / ioRatio
+
+http://budairenqin.iteye.com/blog/2215896
