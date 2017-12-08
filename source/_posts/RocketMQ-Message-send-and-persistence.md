@@ -257,3 +257,85 @@ channel.writeAndFlush(fileRegion)
             你说的netty的FileRegion其实是被rocketmq重新实现的ManyMessageTransfer，而transfer过程其实是将GetMessageResult对象的数据写到netty的channel中，本质是从内核获取数据直接发送至socket，不会复制到用户空间。
             GetMessageResult其实是mmap的一个子缓冲区而已。
             有兴趣可以看看源码 com.alibaba.rocketmq.store.DefaultMessageStore.getMessage方法
+            
+            
+            
+            
+            
+为何要懂零拷贝原理？因为rocketmq存储核心使用的就是零拷贝原理。
+
+1. io读写的方式
+   
+   1. 中断
+   2. DMA
+2. 中断方式
+   1. 中断方式的流程图如下：
+      
+      
+      
+      1. 用户进程发起数据读取请求
+      2. 系统调度为该进程分配cpu
+      3. cpu向io控制器(ide,scsi)发送io请求
+      4. 用户进程等待io完成，让出cpu
+      5. 系统调度cpu执行其他任务
+      6. 数据写入至io控制器的缓冲寄存器
+      7. 缓冲寄存器满了向cpu发出中断信号
+      8. cpu读取数据至内存
+   2. 缺点：中断次数取决于缓冲寄存器的大小
+3. DMA ： 直接内存存取
+   1. DMA方式的流程图如下：
+      
+      
+      
+      1. 用户进程发起数据读取请求
+      2. 系统调度为该进程分配cpu
+      3. cpu向DMA发送io请求
+      4. 用户进程等待io完成，让出cpu
+      5. 系统调度cpu执行其他任务
+      6. 数据写入至io控制器的缓冲寄存器
+      7. DMA不断获取缓冲寄存器中的数据（需要cpu时钟）
+      8. 传输至内存（需要cpu时钟）
+      9. 所需的全部数据获取完毕后向cpu发出中断信号
+   2. 优点：减少cpu中断次数，不用cpu拷贝数据
+4. 数据拷贝
+   1. 下面展示了 传统方式读取数据后并通过网络发送 所发生的数据拷贝：
+      
+      
+      
+      1. 一个read系统调用后，DMA执行了一次数据拷贝，从磁盘到内核空间
+      2. read结束后，发生第二次数据拷贝，由cpu将数据从内核空间拷贝至用户空间
+      3. send系统调用，cpu发生第三次数据拷贝，由cpu将数据从用户空间拷贝至内核空间(socket缓冲区)
+      4. send系统调用结束后，DMA执行第四次数据拷贝，将数据从内核拷贝至协议引擎
+      5. 另外，这四个过程中，每个过程都发生一次上下文切换
+   2. 内存缓冲数据，主要是为了提高性能，内核可以预读部分数据，当所需数据小于内存缓冲区大小时，将极大的提高性能。
+   3. 零拷贝是为了消除这个过程中冗余的拷贝
+5. 零拷贝-sendfile 对应到java中
+   
+   为FileChannel.transferTo(long position, long count, WritableByteChannel target)//
+   将数据从文件通道传输到了给定的可写字节通道
+   1. 避免了第2，3步的数据拷贝，参考下图：
+      
+      
+      
+      1. DMA从拷贝至内核缓冲区
+      2. cpu将数据从内核缓冲区拷贝至内核空间(socket缓冲区)
+      3. DMA将数据从内核拷贝至协议引擎
+      4. 这三个过程中共发生2次上下文切换，分别为发起读取文件和发送数据
+   2. 以上过程发生了三次数据拷贝，其中有一次为cpu完成
+   3. linux内核2.4以后，socket缓冲区做了调整，DMA带收集功能，如下图：
+      
+      
+      
+      1. DMA从拷贝至内核缓冲区
+      2. 将数据的位置和长度的信息的描述符增加至内核空间(socket缓冲区)
+      3. DMA将数据从内核拷贝至协议引擎
+6. 零拷贝-mmap 对应到java中
+   
+   为MappedByteBuffer//文件内存映射
+   1. 数据不会复制到用户空间，只在内核空间，与sendfile类似，但是应用程序可以直接操作该内存。
+7. 参考资料
+   1. http://blog.chinaunix.net/uid-25314474-id-3325879.html
+   2. http://blog.chinaunix.net/uid-28874972-id-3725082.html
+   3. https://www.ibm.com/developerworks/cn/java/j-zerocopy/#fig1
+   4. http://www.ibm.com/developerworks/cn/linux/l-cn-zerocopy1/
+   5. https://www.ibm.com/developerworks/cn/linux/l-cn-zerocopy2/
