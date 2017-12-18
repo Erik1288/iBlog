@@ -52,3 +52,47 @@ public final boolean release(int arg) {
 ### 基于AQS的倒计时锁设计
 
 ### 基于AQS的semaphore设计
+
+
+
+
+
+### 很好的文章
+http://blog.csdn.net/hengyunabc/article/details/28126139
+
+park和unpark的灵活之处
+上面已经提到，unpark函数可以先于park调用，这个正是它们的灵活之处。
+
+一个线程它有可能在别的线程unPark之前，或者之后，或者同时调用了park，那么因为park的特性，它可以不用担心自己的park的时序问题，否则，如果park必须要在unpark之前，那么给编程带来很大的麻烦！！
+
+考虑一下，两个线程同步，要如何处理？
+
+在Java5里是用wait/notify/notifyAll来同步的。wait/notify机制有个很蛋疼的地方是，比如线程B要用notify通知线程A，那么线程B要确保线程A已经在wait调用上等待了，否则线程A可能永远都在等待。编程的时候就会很蛋疼。
+
+另外，是调用notify，还是notifyAll？
+
+notify只会唤醒一个线程，如果错误地有两个线程在同一个对象上wait等待，那么又悲剧了。为了安全起见，貌似只能调用notifyAll了。
+
+park/unpark模型真正解耦了线程之间的同步，线程之间不再需要一个Object或者其它变量来存储状态，不再需要关心对方的状态。
+
+HotSpot里park/unpark的实现
+
+每个java线程都有一个Parker实例，Parker类是这样定义的：
+
+``` C++ 
+class Parker : public os::PlatformParker {  
+private:  
+  volatile int _counter ;  
+  ...  
+public:  
+  void park(bool isAbsolute, jlong time);  
+  void unpark();  
+  ...  
+}  
+class PlatformParker : public CHeapObj<mtInternal> {  
+  protected:  
+    pthread_mutex_t _mutex [1] ;  
+    pthread_cond_t  _cond  [1] ;  
+    ...  
+} 
+```
