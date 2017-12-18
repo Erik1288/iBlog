@@ -17,3 +17,8 @@ http://hllvm.group.iteye.com/group/topic/35385
 debug on linux
 https://segmentfault.com/a/1190000008346240
 
+
+### netbeans看hotspot代码
+
+http://marcelinorc.com/2016/02/17/using-netbeans-to-hack-openjdk9-in-ubuntu/
+
