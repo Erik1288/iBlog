@@ -19,18 +19,18 @@ lua目录 /usr/share/sysbench/
 则运行: sysbench [lua_path] help
 比如: sysbench /usr/share/sysbench/oltp_insert.lua help
 
-sysbench --mysql-host=cobar_2 \
---mysql-port=8066 \
---mysql-user=user \
---mysql-password='user' \
---mysql-db=user \
---threads=100 \
+sysbench --mysql-host=mac \
+--mysql-port=4000 \
+--mysql-user=root \
+--mysql-password= \
+--mysql-db=eric \
+--threads=4 \
 --table-size=10 \
 --auto_inc=off \
 --tables=5 \
 --rand-type=uniform \
 --db-driver=mysql \
---time=60 --events=0 \
+--time=6000000 --events=0 \
 --percentile=99 \
 --report-interval=2 \
 /usr/local/Cellar/sysbench/1.0.11/share/sysbench/oltp_insert.lua \
@@ -48,7 +48,8 @@ sysbench --mysql-host=10.1.21.148 \
 --tables=5 \
 --rand-type=uniform \
 --db-driver=mysql \
---time=60 --events=0 \
+--time=6000000 \
+--events=0 \
 --percentile=99 \
 --report-interval=5 \
 /usr/share/sysbench/oltp_insert.lua \
@@ -67,7 +68,7 @@ sysbench --mysql-host=10.1.21.147 \
 --tables=5 \
 --rand-type=uniform \
 --db-driver=mysql \
---time=60 --events=0 \
+--time=6000000 --events=0 \
 --percentile=99 \
 --report-interval=5 \
 /usr/share/sysbench/oltp_insert.lua \
