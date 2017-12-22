@@ -22,3 +22,14 @@ https://segmentfault.com/a/1190000008346240
 
 http://marcelinorc.com/2016/02/17/using-netbeans-to-hack-openjdk9-in-ubuntu/
 
+./configure --with-target-bits=64 \
+--with-freetype=/usr/local/Cellar/freetype/2.8.1 \
+--enable-ccache \
+--with-jvm-variants=server,client \
+--with-boot-jdk-jvmargs="-Xlint:deprecation -Xlint:unchecked" \
+--disable-zip-debug-info \
+--disable-warnings-as-errors \
+--with-debug-level=slowdebug 2>&1 | tee configure_mac_x64.log
+
+
+bash configure --with-target-bits=64 --with-freetype=/usr/local/Cellar/freetype/2.8.1 --enable-ccache --with-jvm-variants=server,client --with-boot-jdk-jvmargs="-Xlint:deprecation -Xlint:unchecked" --disable-zip-debug-info --disable-warnings-as-errors --with-debug-level=slowdebug
