@@ -177,3 +177,24 @@ Latency (ms):
 Threads fairness:
     events (avg/stddev):           1336.5925/23.11
     execution time (avg/stddev):   60.0307/0.03
+    
+    
+    
+    
+
+sysbench --mysql-host=10.1.134.195 \
+--mysql-port=8066 \
+--mysql-user=user \
+--mysql-password='user' \
+--mysql-db=user \
+--threads=400 \
+--table-size=10 \
+--auto_inc=off \
+--tables=5 \
+--rand-type=uniform \
+--db-driver=mysql \
+--time=6000000 \
+--events=0 \
+--percentile=99 \
+--report-interval=5 \
+/usr/share/sysbench/oltp_insert.lua \
