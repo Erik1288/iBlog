@@ -5,3 +5,6 @@ tags: JVM
 ---
 
 https://yq.aliyun.com/articles/2390
+
+### heap dump
+jmap -dump:format=b,file=heap.bin [java_process_id]
