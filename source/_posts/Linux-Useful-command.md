@@ -56,3 +56,11 @@ envi
 ``` bash
 nmon
 ```
+
+#### 查看某个端口的应用程序PID
+``` bash
+$ lsof -i:9696
+COMMAND    PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+kingshard 4994 eric   24u  IPv6 0x2dd5bc594d052b1f      0t0  TCP *:9696 (LISTEN)
+
+```
