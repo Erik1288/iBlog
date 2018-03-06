@@ -68,8 +68,10 @@ kingshard 4994 eric   24u  IPv6 0x2dd5bc594d052b1f      0t0  TCP *:9696 (LISTEN)
 #### 模拟网络抖动
 http://blog.csdn.net/weiweicao0429/article/details/17578011
 ``` bash
-[root@mysql-queue003 ~]# tc qdisc add dev eth0 root netem delay 100ms
-[root@mysql-queue003 ~]# tc qdisc del dev eth0 root netem delay 100ms
+# tc qdisc add dev eth0 root netem delay 100ms
+# tc qdisc del dev eth0 root netem delay 100ms
+# tc qdisc del dev eth0 root
 ```
 
+#### 进程死亡
 dmesg
