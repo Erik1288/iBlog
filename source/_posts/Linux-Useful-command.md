@@ -42,6 +42,24 @@ ss  -tan|awk 'NR>1{++S[$1]}END{for (a in S) print a,S[a]}'
 ``` bash
 du -sh logs/*
 ```
+```
+$ du -sh Movies/* | sort -nr
+ 28G	Movies/Pan's.Labyrinth.潘神的迷宫.2006.1080p.BluRay.REMUX.MPEG-4.AVC.PCM-WARHD
+ 19G	Movies/The.Lord.Of.The.Rings.The.Return.Of.The.King.2003.1080p.BluRay.x264-SiNNERS
+ 16G	Movies/The.Lord.Of.The.Rings.The.Fellowship.Of.The.Ring.2001.1080p.BluRay.x264-SiNNERS
+ 15G	Movies/Interstellar.星际穿越.2014.1080p.BluRay.x264.DTS-RARBG
+ 14G	Movies/Witness.for.the.Prosecution.控方证人.1957.1080p.BluRay.x264.DTS-WiKi
+ 14G	Movies/Se7en.七宗罪.1995.REMASTERED.1080p.BluRay.x264.DTS-ES-FGT
+ 14G	Movies/In.Bruges.杀手没有假期.2008.1080p.BluRay.x264.DTS-FGT
+ 13G	Movies/Saving.Private.Ryan.拯救大兵瑞恩.1998.1080p.BluRay.x264-LEVERAGE
+ 13G	Movies/Braveheart.勇敢的心.1995.1080p.BluRay.x264-CiNEFiLE
+ 12G	Movies/The.Hunt.狩猎.2012.DANISH.1080p.BluRay.x264.DTS-FGT
+ 12G	Movies/The.Dark.Knight.Rises.蝙蝠侠.黑暗骑士崛起.2012.1080p.BluRay.x264-ALLiANCE
+ 12G	Movies/Life.of.Pi.少年派的奇幻漂流.2012.1080p.BluRay.x264.DTS-FGT
+ 11G	Movies/The.Lost.City.of.Z.迷失Z城.2016.1080p.BluRay.x264-GECKOS[rarbg]
+ 11G	Movies/Manhattan.Murder.Mystery.曼哈顿谋杀疑案.1993.1080p.BluRay.X264-AMIABLE[rarbg]
+ 11G	Movies/Like.Father.Like.Son.如父如子.2013.1080p.BluRay.DTS.x264-PublicHD
+```
 
 #### 将需要交互的命令的结果重定向到文件中
 
