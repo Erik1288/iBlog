@@ -91,5 +91,15 @@ http://blog.csdn.net/weiweicao0429/article/details/17578011
 # tc qdisc del dev eth0 root
 ```
 
-#### 进程死亡
-dmesg
+#### 进程死亡查询
+https://blog.csdn.net/green1893/article/details/78192017
+```
+dmesg | egrep -i -B100 'killed process'
+
+## 或:
+egrep -i 'killed process' /var/log/messages
+egrep -i -r 'killed process' /var/log
+
+## 或:
+journalctl -xb | egrep -i 'killed process'
+```

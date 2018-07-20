@@ -5,6 +5,12 @@ tags: RocketMQ
 ---
 
 
+producer发送消息，如果是立马被消费这种场景
+1.对于consume queue，肯定是顺序读写，所以写进pagecache后，直接就从pagecache被读出来了
+2.对于commit log，虽然不是顺序读，但也是基本有序读，最后大部分也能命中pagecache，不需要走系统IO
+
+如果是消费历史消息，很大程度上，会发现在pagecache中没有，由系统产生缺页中断，从磁盘中重新读到pagecache中（可能还会根据顺序预读很多），然后再将数据从pagecache复制到socket中传输到consumer。
+
 ### 异步刷盘有两种方式
 
 ``` java
@@ -79,7 +85,7 @@ getconf PAGESIZE
 
 终于理解了！！！！ 首先，Kafka重度依赖底层操作系统提供的PageCache功能。当上层有写操作时，操作系统只是将数据写入PageCache，同时标记Page属性为Dirty。当读操作发生时，先从PageCache中查找，如果发生缺页才进行磁盘调度，最终返回需要的数据。实际上PageCache是把尽可能多的空闲内存都当做了磁盘缓存来使用。同时如果有其他进程申请内存，回收PageCache的代价又很小，所以现代的OS都支持PageCache。 
 
-所以说 commit(atLeastSize)的参数就是现代操作系统pagecache的大小。
+所以说 commit(atLeastSize)的参数就是现代操作系统pagecache的大小
 
 
 http://www.jianshu.com/p/6494e33c9b1f
