@@ -103,3 +103,20 @@ egrep -i -r 'killed process' /var/log
 ## 或:
 journalctl -xb | egrep -i 'killed process'
 ```
+
+#### 显示进程中线程
+```
+[nanxing@zerodb-proxy001 zeroproxy]$ pstree -p 25086
+zeroProxy.out(25086)─┬─{zeroProxy.out}(25087)
+                     ├─{zeroProxy.out}(25088)
+                     ├─{zeroProxy.out}(25089)
+                     ├─{zeroProxy.out}(25090)
+                     ├─{zeroProxy.out}(25091)
+                     ├─{zeroProxy.out}(25092)
+                     ├─{zeroProxy.out}(25093)
+                     ├─{zeroProxy.out}(25094)
+                     ├─{zeroProxy.out}(25095)
+                     ├─{zeroProxy.out}(25120)
+                     ├─{zeroProxy.out}(25121)
+                     └─{zeroProxy.out}(25123)
+```

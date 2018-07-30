@@ -384,6 +384,8 @@ sysbench --mysql-host=10.1.21.242 --mysql-port=9696 --mysql-user=zerodb --mysql-
 
 ./benchyou --mysql-host=zerodb-proxy001.pre.2dfire.info --mysql-port=9696 --mysql-db=zerodb --mysql-user=zerodb --mysql-password=zerodb  --oltp-tables-count=5 prepare
 
+./benchyou --mysql-host=192.168.0.109 --mysql-port=9696 --mysql-db=zerodb --mysql-user=zerodb --mysql-password=zerodb  --oltp-tables-count=5 prepare
+
 ./benchyou --mysql-host=zerodb-proxy001.pre.2dfire.info --mysql-port=9696 --mysql-db=zerodb --mysql-user=zerodb --mysql-password=zerodb  --oltp-tables-count=5 cleanup
 
 ./benchyou --mysql-host=zerodb-proxy001.pre.2dfire.info --mysql-port=9696 --mysql-db=zerodb --mysql-user=zerodb --mysql-password=zerodb --ssh-user=nanxing --ssh-password= --oltp-tables-count=5 --write-threads=20 --read-threads=80 --max-time=360000 random
