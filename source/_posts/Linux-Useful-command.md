@@ -120,3 +120,42 @@ zeroProxy.out(25086)─┬─{zeroProxy.out}(25087)
                      ├─{zeroProxy.out}(25121)
                      └─{zeroProxy.out}(25123)
 ```
+
+#### 显示system call
+```
+strace - trace system calls and signals
+```
+
+
+#### iostat 查询磁盘整体问题
+http://coolnull.com/4444.html
+```
+[root@binlog-msg001 zerokeeper]# iostat -x 1 10
+Linux 2.6.32-754.el6.x86_64 (binlog-msg001.dev.2dfire.info) 	08/02/2018 	_x86_64_	(1 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           3.16    0.00    1.51    5.03    0.17   90.14
+
+Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+scd0              0.00     0.00    0.00    0.00     0.01     0.00     7.00     0.00    0.35    0.35    0.00   0.35   0.00
+vda               4.11    10.08  137.57    1.97  2882.02    96.38    21.34     0.23    1.67    1.66    2.48   0.41   5.79
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           1.02    0.00    2.04   96.94    0.00    0.00
+
+Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+scd0              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00
+vda              73.47     0.00   75.51    1.02 49616.33     8.16   648.43     6.91   94.92   96.19    1.00  13.33 102.04
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           1.03    0.00    1.03   97.94    0.00    0.00
+
+Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+scd0              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00
+vda               2.06     0.00   94.85    0.00 50969.07     0.00   537.39     9.49   97.23   97.23    0.00  10.87 103.09
+```
+
+### iotop –o 查看那些进程正在读写磁盘。
+```
+
+```
