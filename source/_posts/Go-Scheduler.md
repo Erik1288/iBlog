@@ -108,3 +108,11 @@ https://lingchao.xin/post/why-golang-garbage-collector-not-implement-generationa
 https://www.jianshu.com/p/7c55fbdef679
 
 在Netty-Jemalloc中提到了jemalloc，tcmalloc是与jemalloc齐名的内存分配算法。
+
+## 有几个重要的问题在这里抛出
+### 怎么写一个程序，这个程序会大量创建线程？？
+如果能理解这个问题，就基本上可以理解golang的调度器，可以参考下面的这个链接
+https://stackoverflow.com/questions/27600587/why-my-program-of-golang-create-so-many-threads
+
+
+## 如果linux的cpu使用率非常低，cpu的load会不会很高？
