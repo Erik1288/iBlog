@@ -102,3 +102,9 @@ Generational and Compact gc have already been thought best practice. But golang 
 
 官方回答：
 https://lingchao.xin/post/why-golang-garbage-collector-not-implement-generational-and-compact-gc.html
+
+
+## google's tcmalloc
+https://www.jianshu.com/p/7c55fbdef679
+
+在Netty-Jemalloc中提到了jemalloc，tcmalloc是与jemalloc齐名的内存分配算法。
