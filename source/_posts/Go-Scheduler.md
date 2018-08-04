@@ -95,3 +95,10 @@ pprof -http "0.0.0.0:12345" 'http://10.12.0.241:50011/debug/pprof/profile'
 
 ## 这里的图片可以参考下
 https://blog.csdn.net/u010824081/article/details/78186611
+
+
+## 为什么 Go 不实现分代和紧凑(Compact) gc
+Generational and Compact gc have already been thought best practice. But golang doesn't adopt it. Who can tell me the reason? 
+
+官方回答：
+https://lingchao.xin/post/why-golang-garbage-collector-not-implement-generational-and-compact-gc.html
