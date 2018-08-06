@@ -15,3 +15,7 @@ GO语言内存管理子系统主要由两部分组成：内存分配器和垃圾
 为什么大部分编程语言都会给对象分配的内存设计「堆Heap」和「栈Stack」这么两块区域？
 
 golang在「堆Heap」和「栈Stack」内存分配上有没有做什么优化？
+参考官方（https://groups.google.com/forum/#!msg/golang-nuts/KJiyv2mV2pU/wdBUH1mHCAAJ）
+The Go compiler uses escape analysis to find objects whose lifetime is known at compile time, and allocates them on the stack rather than in garbage collected memory. 
+So in general, in Go, compared to other languages, a larger percentage of the quickly-unused values that a generational GC looks for are never allocated in GC memory in the first place.  So a generational GC would likely bring less advantage to Go than it does for other 
+languages. 
