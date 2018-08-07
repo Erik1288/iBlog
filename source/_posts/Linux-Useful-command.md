@@ -127,7 +127,7 @@ strace - trace system calls and signals
 ```
 
 
-#### iostat 查询磁盘整体问题
+#### iostat 查询磁盘整体问题（比如iops）
 http://coolnull.com/4444.html
 ```
 [root@binlog-msg001 zerokeeper]# iostat -x 1 10
