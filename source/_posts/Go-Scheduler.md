@@ -187,3 +187,61 @@ https://stackoverflow.com/questions/27600587/why-my-program-of-golang-create-so-
 
 
 ## 如果linux的cpu使用率非常低，cpu的load会不会很高？
+
+## 调度器初始化源码分析
+```
+func schedinit() {
+	// raceinit must be the first call to race detector.
+	// In particular, it must be done before mallocinit below calls racemapshadow.
+	_g_ := getg()
+	if raceenabled {
+		_g_.racectx, raceprocctx0 = raceinit()
+	}
+
+	sched.maxmcount = 10000
+
+	tracebackinit()
+	moduledataverify()
+	stackinit()
+	mallocinit()
+	mcommoninit(_g_.m)
+	alginit()       // maps must not be used before this call
+	modulesinit()   // provides activeModules
+	typelinksinit() // uses maps, activeModules
+	itabsinit()     // uses activeModules
+
+	msigsave(_g_.m)
+	initSigmask = _g_.m.sigmask
+
+	goargs()
+	goenvs()
+	parsedebugvars()
+	gcinit()
+
+	sched.lastpoll = uint64(nanotime())
+	procs := ncpu
+	if n, ok := atoi32(gogetenv("GOMAXPROCS")); ok && n > 0 {
+		procs = n
+	}
+	if procresize(procs) != nil {
+		throw("unknown runnable goroutine during bootstrap")
+	}
+
+	// For cgocheck > 1, we turn on the write barrier at all times
+	// and check all pointer writes. We can't do this until after
+	// procresize because the write barrier needs a P.
+	if debug.cgocheck > 1 {
+		writeBarrier.cgo = true
+		writeBarrier.enabled = true
+		for _, p := range allp {
+			p.wbBuf.reset()
+		}
+	}
+
+	if buildVersion == "" {
+		// Condition should never trigger. This code just serves
+		// to ensure runtime·buildVersion is kept in the resulting binary.
+		buildVersion = "unknown"
+	}
+}
+```
