@@ -124,6 +124,7 @@ Generational and Compact gc have already been thought best practice. But golang 
 
 官方回答：
 https://lingchao.xin/post/why-golang-garbage-collector-not-implement-generational-and-compact-gc.html
+https://groups.google.com/forum/#!msg/golang-nuts/KJiyv2mV2pU/wdBUH1mHCAAJ
 
 
 ## google's tcmalloc
