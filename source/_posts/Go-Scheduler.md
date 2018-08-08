@@ -9,21 +9,69 @@ tags:
 
 什么叫做并行，基础是什么？
 在同一时刻内，多件时间一起做。
+对处理器，或者单处理器多核心。
 有个问题，如果系统总共有4个线程，在4核的机器上，应该不会有上下文切换吧？
 
 什么叫做并发，基础是什么？
-并发的概念没有并行严格，指在一个时段内，多件事情一起做。并发的基础是并行和多线程调度，线程是操作系统进程中能够并发执行的实体，是处理器调度和分派的基本单位。
+并发的概念没有并行严格，指在一个时段内，多件事情一起做。并发的基础是并行和多线程调度，线程是操作系统进程中能够并发执行的实体，是处理器调度和分派的基本单位。 P101:一个线程什么时候获得CPU时间，能够运行多久，是由调度器根据某种调度策略所定。叫做线程的调度，也叫线程的上下文切换
 
 程序在处理一个问题时，是不是线程越多越好？
 送分题，不是，1分拿到。从煎鸡蛋和数学题开始讨论，哪一个线程可以适当多一点，哪一个可以少一点，多到多少最好，少到多少最好？
 
-注意到，既然我们在煎鸡蛋的时候无法自己直观得确定内核线程的数量，开小了，并发度不够，开大了，上下文切换太严重，在golang的设计哲学里，这个事情就由golang来做。所以，大部分情况下，go编译的程序运行时，无法控制线程的数量。
+注意到，既然我们在煎鸡蛋的时候无法自己直观得确定内核线程的数量，开小了，并发度不够，开大了，上下文切换太严重，在golang的设计哲学里，决定到底要创建多少个线程合适，这个事情就由golang来做。所以，大部分情况下，go程序运行时，无法控制线程的数量。
 
-更加细粒度的并发执行的调度单位：协程(goroutine)。线程的调度是由操作系统来做的，协程的调度就是由go scheduler (runtime)来做的。
+更加细粒度的并发执行的调度单位：协程(goroutine)。线程的调度是由操作系统来做的，协程的调度就是由go scheduler (runtime)来做的。本质上，协程如果要执行，还是需要线程的支持。
+模仿上面的话，一个协程什么时候获得线程的时间，能够占用线程运行多久，就是go scheduler做的事情。也叫协程的上下文切换，是一种非常轻量级的上下文切换。
+
+当然事情远远没有那么简单
 
 
+用刚刚所说的理论，来解释下，为什么net包中的IO一定是非阻塞的。
+假如，IO是阻塞的，会发生什么情况
+在zeroProxy或者tidb中，proxy层来一个用户就启用一个goroutine来单独处理读和写，假如有1万个连接同时进来，所有的连接都在read上阻塞，由于是阻塞IO，那么阻塞的级别就不在goroutine上，而是在内核线程上。这时
 
+查看下源码:
+```go
+func (fd *FD) Read(p []byte) (int, error) {
+	if err := fd.readLock(); err != nil {
+		return 0, err
+	}
+	defer fd.readUnlock()
+	if len(p) == 0 {
+		// If the caller wanted a zero byte read, return immediately
+		// without trying (but after acquiring the readLock).
+		// Otherwise syscall.Read returns 0, nil which looks like
+		// io.EOF.
+		// TODO(bradfitz): make it wait for readability? (Issue 15735)
+		return 0, nil
+	}
+	if err := fd.pd.prepareRead(fd.isFile); err != nil {
+		return 0, err
+	}
+	if fd.IsStream && len(p) > maxRW {
+		p = p[:maxRW]
+	}
+	for {
+		n, err := syscall.Read(fd.Sysfd, p)
+		if err != nil {
+			n = 0
+			if err == syscall.EAGAIN && fd.pd.pollable() {
+				if err = fd.pd.waitRead(fd.isFile); err == nil {
+					continue
+				}
+			}
 
+			// On MacOS we can see EINTR here if the user
+			// pressed ^Z.  See issue #22838.
+			if runtime.GOOS == "darwin" && err == syscall.EINTR {
+				continue
+			}
+		}
+		err = fd.eofError(n, err)
+		return n, err
+	}
+}
+```
 
 
 http://morsmachine.dk/go-scheduler
