@@ -29,7 +29,8 @@ tags:
 http://morsmachine.dk/go-scheduler
 https://www.zhihu.com/question/20862617
 https://www.zhihu.com/question/22345230
-
+#### 进击的Golang专栏——说说Golang的runtime
+https://zhuanlan.zhihu.com/p/27328476
 
 从监控Go进程中的线程开始讲起:
 
