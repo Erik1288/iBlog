@@ -182,6 +182,8 @@ https://www.jianshu.com/p/7c55fbdef679
 
 ## 有几个重要的问题在这里抛出
 ### 怎么写一个程序，这个程序会大量创建线程？？
+https://stackoverflow.com/questions/28186361/why-does-it-not-create-many-threads-when-many-goroutines-are-blocked-in-writing
+这里面有答案
 如果能理解这个问题，就基本上可以理解golang的调度器，可以参考下面的这个链接
 https://stackoverflow.com/questions/27600587/why-my-program-of-golang-create-so-many-threads
 
