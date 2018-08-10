@@ -19,3 +19,12 @@ golang在「堆Heap」和「栈Stack」内存分配上有没有做什么优化�
 The Go compiler uses escape analysis to find objects whose lifetime is known at compile time, and allocates them on the stack rather than in garbage collected memory. 
 So in general, in Go, compared to other languages, a larger percentage of the quickly-unused values that a generational GC looks for are never allocated in GC memory in the first place.  So a generational GC would likely bring less advantage to Go than it does for other 
 languages. 
+
+
+### 简书 tcmalloc
+https://www.jianshu.com/p/ec585064a6e1
+
+### 对比JVM中的逃逸分析
+http://www.importnew.com/23150.html
+
+### golang的逃逸分析
