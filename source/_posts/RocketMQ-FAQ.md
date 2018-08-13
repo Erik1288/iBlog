@@ -81,7 +81,7 @@ RebalanceServer生成 PullRequest 会调用PullMessageService 放入 PullRequest
 
 可以。
 
-### Page Cache到底是个什么东西？
+### pagecache到底是个什么东西？
 
 ### 对于不可读的Consume Queue，Consumer rebalance时会不会考虑到？
 
@@ -187,5 +187,10 @@ http://www.jianshu.com/p/7835726dc78b?utm_campaign=maleskine&utm_content=note&ut
 
 http://www.jianshu.com/p/5ab57182af89?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation
 
+### 同步刷盘会不会丢消息?
+
+### 为什么kafka没有commitlog文件，而rocketmq有?
+
+### 为什么有了kafka，阿里还要开发出rocketmq，rocketmq解决了什么kafka的问题？
 
 
