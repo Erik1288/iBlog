@@ -6,6 +6,9 @@ tags:
 
 
 ### 什么是pagecache
+```
+In computing, a page cache, sometimes also called disk cache,[2] is a transparent cache for the pages originating from a secondary storage device such as a hard disk drive (HDD). The operating system keeps a page cache in otherwise unused portions of the main memory (RAM), resulting in quicker access to the contents of cached pages and overall performance improvements. A page cache is implemented in kernels with the paging memory management, and is mostly transparent to applications.
+```
 
 ### pagecache查看
 free -h
@@ -26,3 +29,6 @@ pcstat
 
 ### pagecache应用
 RocketMQ和Kafka的应用
+
+### pagecache参考文章
+https://www.cnblogs.com/kevingrace/p/5991604.html
