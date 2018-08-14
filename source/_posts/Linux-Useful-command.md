@@ -21,7 +21,16 @@ grep -Rl 1496628000000 order_migrate_conf/
 ``` bash
 less file.log
 ```
-
+```
+sudo vim perf-payload-5.log 
+# vim讲文件全部加载到pagecache中去了
+[jump@zerodb-agent009 app]$ sudo ./pcstat perf-payload-5.log 
+|--------------------+----------------+------------+-----------+---------|
+| Name               | Size           | Pages      | Cached    | Percent |
+|--------------------+----------------+------------+-----------+---------|
+| perf-payload-5.log | 31792791       | 7762       | 7762      | 100.000 |
+|--------------------+----------------+------------+-----------+---------|
+```
 
 #### 超大文件从后往前查找关键词kind_pay
 
