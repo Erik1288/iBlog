@@ -17,3 +17,6 @@ https://zhuanlan.zhihu.com/p/31644462
 
 ### 好文章
 http://skoo.me/go/2014/04/21/go-net-core?hmsr=studygolang.com&utm_medium=studygolang.com&utm_source=studygolang.com
+
+### TCP超时
+https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/?utm_source=studygolang&utm_medium=email
