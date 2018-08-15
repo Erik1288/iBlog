@@ -32,6 +32,9 @@ class SpinLock {
 
 ### Disruptor:为什么会这么快
 https://ifeve.com/disruptor/
+1. 无锁CAS抢占，防止上下文切换
+2. 伪共享内存，独立缓存存放独立cursor变量
+3. RingBuffer，减少GC
 
 
 ### Disruptor视频资源
