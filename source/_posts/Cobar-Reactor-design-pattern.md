@@ -9,6 +9,9 @@ tags: Cobar
 ### Redis为什么是单线程的？
 http://www.dengshenyu.com/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/2016/01/09/redis-reactor-pattern.html
 
+### C10K问题
+https://segmentfault.com/a/1190000007240744
+
 不急，我们先看例子:
 
 假设一个班上有5个老师，其中一个为主考官，让3000个学生现场画一幅图，然后给每个学生一个分数。学生在画图之前有时间思考，但不能动笔，等到作画有灵感了，举手向老师示意，老师来现场看你作画。
