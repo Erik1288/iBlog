@@ -76,3 +76,10 @@ tcp    CLOSE-WAIT 1      0       ::ffff:10.12.1.62:9696                  ::ffff:
 tcp    CLOSE-WAIT 1      0       ::ffff:10.12.1.62:9696                  ::ffff:10.12.1.74:43088                
 tcp    CLOSE-WAIT 1      0       ::ffff:10.12.1.62:9696                  ::ffff:10.12.1.74:43456
 ```
+
+### 服务器TIME_WAIT和CLOSE_WAIT详解和解决办法
+https://www.cnblogs.com/sunxucool/p/3449068.html
+
+
+### 怎么写CLOSE_WAIT
+非常简单，写一个Proxy，proxy创建很多与mysql的连接，proxy将每个连接的指针放入某个不回收的容器，这时关闭mysql，查看proxy的连接，就是CLOSE_WAIT
