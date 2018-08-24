@@ -9,6 +9,26 @@ tags: Linux
 ``` bash
 sudo sed -i 's/aaa/bbb/g' `grep -Rl aaa order_migrate_conf/`
 ```
+真实案例
+```
+sudo sed -i '/canal.instance.master.position/d' `grep -Rl cluster1611 /opt/app/canal/conf/*`
+sudo sed -i '/canal.instance.master.position/d' `grep -Rl cluster1612 /opt/app/canal/conf/*`
+sudo sed -i '/canal.instance.master.position/d' `grep -Rl cluster1613 /opt/app/canal/conf/*`
+sudo sed -i '/canal.instance.master.position/d' `grep -Rl cluster1614 /opt/app/canal/conf/*`
+sudo sed -i '/canal.instance.master.journal.name/d' `grep -Rl cluster1611 /opt/app/canal/conf/*`
+sudo sed -i '/canal.instance.master.journal.name/d' `grep -Rl cluster1612 /opt/app/canal/conf/*`
+sudo sed -i '/canal.instance.master.journal.name/d' `grep -Rl cluster1613 /opt/app/canal/conf/*`
+sudo sed -i '/canal.instance.master.journal.name/d' `grep -Rl cluster1614 /opt/app/canal/conf/*`
+
+sudo sed -i 'N;8icanal.instance.master.journal.name = mysql-bin.000017' `grep -Rl cluster1611 /opt/app/canal/conf/*`
+sudo sed -i 'N;8icanal.instance.master.journal.name = mysql-bin.000015' `grep -Rl cluster1612 /opt/app/canal/conf/*`
+sudo sed -i 'N;8icanal.instance.master.journal.name = mysql-bin.000014' `grep -Rl cluster1613 /opt/app/canal/conf/*`
+sudo sed -i 'N;8icanal.instance.master.journal.name = mysql-bin.000015' `grep -Rl cluster1614 /opt/app/canal/conf/*`
+sudo sed -i 'N;8icanal.instance.master.position = 4' `grep -Rl cluster1611 /opt/app/canal/conf/*`
+sudo sed -i 'N;8icanal.instance.master.position = 4' `grep -Rl cluster1612 /opt/app/canal/conf/*`
+sudo sed -i 'N;8icanal.instance.master.position = 4' `grep -Rl cluster1613 /opt/app/canal/conf/*`
+sudo sed -i 'N;8icanal.instance.master.position = 4' `grep -Rl cluster1614 /opt/app/canal/conf/*`
+```
 
 #### 查找目录下的所有文件中是否含有某个字符串,并且只打印出文件名
 
