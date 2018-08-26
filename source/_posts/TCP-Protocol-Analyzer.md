@@ -83,3 +83,6 @@ https://www.cnblogs.com/sunxucool/p/3449068.html
 
 ### 怎么写CLOSE_WAIT
 非常简单，写一个Proxy，proxy创建很多与mysql的连接，proxy将每个连接的指针放入某个不回收的容器，这时关闭mysql，查看proxy的连接，就是CLOSE_WAIT
+
+### 为什么Proxy和MySQL连得好好的，会大量产生CLOSE-WAIT？
+原因在于MySQL 的默认设置下，当一个连接的空闲时间超过8小时后，MySQL 就会断开该连接，而proxy连接池则以为该被断开的连接依然有效，其实连接已经是CLOSE-WAIT状态。在这种情况下，如果客户端代码向proxy连接池请求连接的话，连接池就会把已经失效的连接返回给客户端，客户端在使用该失效连接的时候即抛出异常。
