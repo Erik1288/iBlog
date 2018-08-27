@@ -32,3 +32,22 @@ RocketMQ和Kafka的应用
 
 ### pagecache参考文章
 https://www.cnblogs.com/kevingrace/p/5991604.html
+
+### sync
+```
+SYNC(1)                          User Commands                         SYNC(1)
+
+NAME
+       sync - flush file system buffers
+
+SYNOPSIS
+       sync [OPTION]
+
+DESCRIPTION
+       Force changed blocks to disk, update the super block.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+```
