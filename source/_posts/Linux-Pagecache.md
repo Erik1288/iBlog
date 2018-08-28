@@ -12,7 +12,8 @@ In computing, a page cache, sometimes also called disk cache,[2] is a transparen
 
 ### pagecache查看
 free -h
-pcstat
+
+推荐一款工具pcstat(https://github.com/tobert/pcstat)，它可以直观得显示出指定文件是否被cache，甚至可以知道cache的比例是多少。
 
 ### pagecache清理
 ```
