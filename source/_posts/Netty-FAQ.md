@@ -5,6 +5,7 @@ tags: Netty
 ---
 
 ### 怎么样的情况下，netty会发生内存泄露，应该怎么样去检测内存泄露，应该要怎么样处理？
+https://www.jianshu.com/p/73fff8e09fed
 
 ### Netty 编解码器
 ByteToMessageDecoder与LengthFieldBasedFrameDecoder的区别
