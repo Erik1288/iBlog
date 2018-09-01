@@ -34,6 +34,21 @@ RocketMQ和Kafka的应用
 ### pagecache参考文章
 https://www.cnblogs.com/kevingrace/p/5991604.html
 
+### page cache与脏页
+https://blog.csdn.net/yunsongice/article/details/5850855
+
+```
+页面类型 
+
+Linux 中内存页面有三种类型： 
+
+·    Read pages，只读页（或代码页），那些通过主缺页中断从硬盘读取的页面，包括不能修改的静态文件、可执行文件、库文件等。当内核需要它们的时候把它们读到 内存中，当内存不足的时候，内核就释放它们到空闲列表，当程序再次需要它们的时候需要通过缺页中断再次读到内存。 
+
+·    Dirty pages，脏页，指那些在内存中被修改过的数据页，比如文本文件等。这些文件由 pdflush 负责同步到硬盘，内存不足的时候由 kswapd 和 pdflush 把数据写回硬盘并释放内存。 
+
+·    Anonymous pages，匿名页，那些属于某个进程但是又和任何文件无关联，不能被同步到硬盘上，内存不足的时候由 kswapd 负责将它们写到交换分区并释放内存。 
+```
+
 ### sync
 ```
 SYNC(1)                          User Commands                         SYNC(1)
