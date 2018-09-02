@@ -5,6 +5,9 @@ tags:
 ---
 
 
+### Linux文件读写机制及优化方式
+https://blog.csdn.net/littlewhite1989/article/details/52583879
+
 ### 什么是pagecache
 ```
 In computing, a page cache, sometimes also called disk cache,[2] is a transparent cache for the pages originating from a secondary storage device such as a hard disk drive (HDD). The operating system keeps a page cache in otherwise unused portions of the main memory (RAM), resulting in quicker access to the contents of cached pages and overall performance improvements. A page cache is implemented in kernels with the paging memory management, and is mostly transparent to applications.
@@ -47,6 +50,23 @@ Linux 中内存页面有三种类型：
 ·    Dirty pages，脏页，指那些在内存中被修改过的数据页，比如文本文件等。这些文件由 pdflush 负责同步到硬盘，内存不足的时候由 kswapd 和 pdflush 把数据写回硬盘并释放内存。 
 
 ·    Anonymous pages，匿名页，那些属于某个进程但是又和任何文件无关联，不能被同步到硬盘上，内存不足的时候由 kswapd 负责将它们写到交换分区并释放内存。 
+```
+
+### 怎么查看脏页的大小
+```
+cat /proc/meminfo |grep Dirty
+Dirty:              1184 kB
+```
+
+### 怎么查看关于脏页刷新的配置
+```
+[root@kafka1003 ~]# sysctl -a |grep dirty
+vm.dirty_background_bytes = 0
+vm.dirty_background_ratio = 10
+vm.dirty_bytes = 0
+vm.dirty_expire_centisecs = 3000
+vm.dirty_ratio = 30
+vm.dirty_writeback_centisecs = 500
 ```
 
 ### sync
