@@ -191,6 +191,10 @@ http://www.jianshu.com/p/5ab57182af89?utm_campaign=maleskine&utm_content=note&ut
 
 ### 为什么kafka没有commitlog文件，而rocketmq有?
 
+### kafka什么场景下，性能会比较低？
+
 ### 为什么有了kafka，阿里还要开发出rocketmq，rocketmq解决了什么kafka的问题？
 
+### RocketMQ怎么通过Pagecache加速的？
+![image.png](http://processon.com/chart_image/5b892eb9e4b0bd4db926c7a4.png?=1)
 
