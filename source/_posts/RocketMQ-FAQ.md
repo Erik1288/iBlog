@@ -6,6 +6,14 @@ tags: RocketMQ
 
 工作和学习中使用RocketMQ产生的困惑和总结，属于临时半成品文章，整理完了会单独成文。
 
+> 先来一个图，总结得非常好
+
+https://blog.csdn.net/qq_27529917/article/details/79595395
+https://upload-images.jianshu.io/upload_images/6302559-48fbc4f75fbf2412.png
+
+
+
+
 ### 为什么RocketMQ性能很高？
 
 主要还是得益于存储模型，利用磁盘顺序读写性能远高于随机读写的特性。
