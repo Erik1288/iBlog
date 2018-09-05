@@ -11,6 +11,9 @@ DESCRIPTION
     cache  Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)
 ```
 
+### Linux文件读写机制及优化方式
+https://blog.csdn.net/littlewhite1989/article/details/52583879
+
 pagecache是RocketMQ高性能实现上使用的一个利器。虽然源码中没有对pagecache的做过多解释，但是作为RocketMQ的研究者，必须清楚得认识到pagecache对于性能的影响有多么巨大。本文借用一些工具帮助我们更好理解RocketMQ是如何在设计上就利用上pagecache。
 
 首先推荐一款工具pcstat(https://github.com/tobert/pcstat)，它可以直观得显示出指定文件是否被cache，甚至可以知道cache的比例是多少。
