@@ -12,7 +12,8 @@ https://blog.csdn.net/qq_27529917/article/details/79595395
 https://upload-images.jianshu.io/upload_images/6302559-48fbc4f75fbf2412.png
 
 
-
+### RocketMQ与Kafka架构上的巨大差异 -- CommitLog与ConsumeQueue
+https://blog.csdn.net/chunlongyu/article/details/54576649
 
 ### 为什么RocketMQ性能很高？
 
