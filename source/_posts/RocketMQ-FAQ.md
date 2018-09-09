@@ -63,6 +63,25 @@ RebalanceServer生成 PullRequest 会调用PullMessageService 放入 PullRequest
 
 1. consumer长轮询，在没有消息时hold在server端。
 2. commit log的max offset增大，触发空轮询ReputMessageService，构建完consume queue之后，调用messageArrivingListener通知消息到了，从而重新processRequest来pull消息。
+但是问题发现了，构建ConsumeQueue理论上是有一个性能极限值的，那这样的话，不是会很容易发送的消息，消费会有延时么？
+```java
+@Override
+public void run() {
+    DefaultMessageStore.log.info(this.getServiceName() + " service started");
+
+    while (!this.isStopped()) {
+        try {
+            // 这里睡眠了1ms，可以算出写入ConsumerQueue的性能极限值
+            Thread.sleep(1);
+            this.doReput();
+        } catch (Exception e) {
+            DefaultMessageStore.log.warn(this.getServiceName() + " service has exception. ", e);
+        }
+    }
+
+    DefaultMessageStore.log.info(this.getServiceName() + " service end");
+}
+```
 
 未解决问题：
 
