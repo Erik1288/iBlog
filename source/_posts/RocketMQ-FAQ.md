@@ -14,6 +14,15 @@ https://upload-images.jianshu.io/upload_images/6302559-48fbc4f75fbf2412.png
 
 ### RocketMQ与Kafka架构上的巨大差异 -- CommitLog与ConsumeQueue
 https://blog.csdn.net/chunlongyu/article/details/54576649
+```
+每个topic_partition对应一个日志文件，Producer对该日志文件进行“顺序写”，Consumer对该文件进行“顺序读”。
+
+但正如在“拨乱反正”续篇中所提到的：这种存储方式，对于每个文件来说是顺序IO，但是当并发的读写多个partition的时候，对应多个文件的顺序IO，表现在文件系统的磁盘层面，还是随机IO。
+
+因此出现了当partition或者topic个数过多时，Kafka的性能急剧下降
+
+虽然每个文件是顺序IO，但topic或者partition过多，每个文件的顺序IO，表现到磁盘上，还是随机IO。
+```
 
 ### 为什么RocketMQ性能很高？
 
@@ -226,3 +235,7 @@ http://www.jianshu.com/p/5ab57182af89?utm_campaign=maleskine&utm_content=note&ut
 ### RocketMQ怎么通过Pagecache加速的？
 ![image.png](http://processon.com/chart_image/5b892eb9e4b0bd4db926c7a4.png?=1)
 
+### RocketMQ QueueSelector怎么应对Topic的ConsumeQueue扩容？
+```
+Although it’s possible to increase the number of partitions over time, one has to be careful if messages are produced with keys. When publishing a keyed message, Kafka deterministically maps the message to a partition based on the hash of the key. This provides a guarantee that messages with the same key are always routed to the same partition. This guarantee can be important for certain applications since messages within a partition are always delivered in order to the consumer. If the number of partitions changes, such a guarantee may no longer hold. To avoid this situation, a common practice is to over-partition a bit.
+```
