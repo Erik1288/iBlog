@@ -235,6 +235,10 @@ http://www.jianshu.com/p/5ab57182af89?utm_campaign=maleskine&utm_content=note&ut
 ### RocketMQ怎么通过Pagecache加速的？
 ![image.png](http://processon.com/chart_image/5b892eb9e4b0bd4db926c7a4.png?=1)
 
+### 怎么保证同步刷盘也有效率？
+GroupCommit
+批量一次性全部刷盘
+
 ### RocketMQ QueueSelector怎么应对Topic的ConsumeQueue扩容？
 ```
 Although it’s possible to increase the number of partitions over time, one has to be careful if messages are produced with keys. When publishing a keyed message, Kafka deterministically maps the message to a partition based on the hash of the key. This provides a guarantee that messages with the same key are always routed to the same partition. This guarantee can be important for certain applications since messages within a partition are always delivered in order to the consumer. If the number of partitions changes, such a guarantee may no longer hold. To avoid this situation, a common practice is to over-partition a bit.
