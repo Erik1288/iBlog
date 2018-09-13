@@ -70,3 +70,6 @@ public void buildIndex(DispatchRequest req) {
     }
 }
 ```
+
+
+TODO 如果产生Hash冲突，会发生什么？
