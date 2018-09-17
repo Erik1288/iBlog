@@ -28,3 +28,8 @@ https://www.jianshu.com/p/ec585064a6e1
 http://www.importnew.com/23150.html
 
 ### golang的逃逸分析
+
+### Region-based memory management
+https://en.wikipedia.org/wiki/Region-based_memory_management
+
+In computer science, region-based memory management is a type of memory management in which each allocated object is assigned to a region. A region, also called a zone, arena, area, or memory context, is a collection of allocated objects that can be efficiently deallocated all at once. Like stack allocation, regions facilitate allocation and deallocation of memory with low overhead; but they are more flexible, allowing objects to live longer than the stack frame in which they were allocated. In typical implementations, all objects in a region are allocated in a single contiguous range of memory addresses, similarly to how stack frames are typically allocated.
