@@ -37,8 +37,48 @@ public boolean isTransientStorePoolEnable() {
 }
 ```
 
+
+### 功力深厚的文章
 transientStorePoolEnable的具体含义是什么？
 FlushRealTimeService和CommitRealTimeService刷盘的方式有什么区别，在性能有什么区别？
+
+```
+NAME
+     mlock, munlock -- lock (unlock) physical pages in memory
+
+SYNOPSIS
+     #include <sys/mman.h>
+
+     int
+     mlock(const void *addr, size_t len);
+
+     int
+     munlock(const void *addr, size_t len);
+
+DESCRIPTION
+     The mlock system call locks a set of physical pages into memory.  The pages are associated with a virtual address range
+     that starts at addr and extends for len bytes.  The munlock call unlocks pages that were previously locked by one or more
+     mlock calls.  For both calls, the addr parameter should be aligned to a multiple of the page size.  If the len parameter
+     is not a multiple of the page size, it will be rounded up to be so.  The entire range must be allocated.
+
+     After an mlock call, the indicated pages will cause neither a non-resident page nor address-translation fault until they
+     are unlocked.  They may still cause protection-violation faults or TLB-miss faults on architectures with software-managed
+     TLBs.  The physical pages remain in memory until all locked mappings for the pages are removed.
+
+     Multiple processes may have the same physical pages locked via their own virtual address mappings.  Similarly, a single
+     process may have pages multiply-locked via different virtual mappings of the same pages or via nested mlock calls on the
+     same address range.  Unlocking is performed explicitly by munlock or implicitly by a call to munmap, which deallocates
+     the unmapped address range.  Locked mappings are not inherited by the child process after a fork(2).
+
+     Because physical memory is a potentially scarce resource, processes are limited in how much memory they can lock down.  A
+     single process can mlock the minimum of a system-wide ``wired pages'' limit and the per-process RLIMIT_MEMLOCK resource
+     limit.
+
+RETURN VALUES
+     A return value of 0 indicates that the call succeeded and all pages in the range have either been locked or unlocked, as
+     requested.  A return value of -1 indicates an error occurred and the locked status of all pages in the range remains
+     unchanged.  In this case, the global location errno is set to indicate the error.
+```
 
 ![你想输入的替代文字](RocketMQ-Message-send-and-persistence/disc-fall.gif)
 
