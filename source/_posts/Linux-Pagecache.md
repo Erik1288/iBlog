@@ -31,6 +31,9 @@ free -h
 [root@backup ~]# echo 3 > /proc/sys/vm/drop_caches     或者 # sysctl -w vm.drop_caches=3
 ```
 
+### pagecache中脏页调优
+https://blog.csdn.net/csCrazybing/article/details/78127308
+
 ### pagecache应用
 RocketMQ和Kafka的应用
 
