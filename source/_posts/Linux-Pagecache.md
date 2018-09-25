@@ -72,6 +72,13 @@ vm.dirty_ratio = 30
 vm.dirty_writeback_centisecs = 500
 ```
 
+### 脏页刷盘的几种情况
+1. 局部脏页过期dirty_expire_centisecs
+2. 全部脏页定时dirty_writeback_centisecs
+3. 全部脏页数量达到阈值dirty_background_bytes/dirty_bytes
+4. 全部脏页比例达到阈值dirty_background_ratio/dirty_ratio
+5. 手动执行fsync/sync
+
 ### sync
 ```
 SYNC(1)                          User Commands                         SYNC(1)
