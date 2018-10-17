@@ -4,6 +4,9 @@ date: 2018-09-07 10:17:32
 tags:
 ---
 
+### 也可以看看这篇文章
+https://www.cnblogs.com/JohnABC/p/3521061.html
+
 ### 什么是标准的事务隔离级别
 事务隔离级别是来界定事务与事务之间数据可见性的程度。
 在ANIS SQL标准中一共4种，按照可见性程度的从大到小，分别是：
@@ -40,7 +43,7 @@ TX A | TX B
 Begin |
 select count from balance where user_id = 1; // 返回1000.00 |
 | Begin
-| update balance set count = 2000 where user_id = 1; |
+| update balance set count = 2000 where user_id = 1;
 select count from balance where user_id = 1; // 返回2000.00 |
 | Rollback
 select count from balance where user_id = 1; // 返回1000.00 |

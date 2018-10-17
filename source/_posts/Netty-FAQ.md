@@ -7,16 +7,13 @@ tags: Netty
 ### 怎么样的情况下，netty会发生内存泄露，应该怎么样去检测内存泄露，应该要怎么样处理？
 https://www.jianshu.com/p/73fff8e09fed
 
-### Netty 编解码器
-ByteToMessageDecoder与LengthFieldBasedFrameDecoder的区别
-
 ### 重要概念 Future and Promise
 
 ### Netty处理的对象
 
 bytes and messages.
 
-### 如何调试时间循环线程
+### 如何调试时间循环线程（自己总结的，精彩）
 当我们用debug启动netty server时，我们不知道boss线程运行的代码，那怎么样才能发现boss线程当前的执行轨迹呢。如果能找到轨迹，对我们研究boss线程有非常大的帮助。
 
 给boss时间循环线程池起个名字
@@ -96,17 +93,27 @@ http://blog.csdn.net/dc_726/article/details/48978891
 
 ``` java
 private static ServerSocketChannel newSocket(SelectorProvider provider) {
-        try {
-            /**
-             *  Use the {@link SelectorProvider} to open {@link SocketChannel} and so remove condition in
-             *  {@link SelectorProvider#provider()} which is called by each ServerSocketChannel.open() otherwise.
-             *
-             *  See <a href="https://github.com/netty/netty/issues/2308">#2308</a>.
-             */
-            return provider.openServerSocketChannel();
-        } catch (IOException e) {
-            throw new ChannelException(
-                    "Failed to open a server socket.", e);
-        }
+    try {
+        /**
+         *  Use the {@link SelectorProvider} to open {@link SocketChannel} and so remove condition in
+         *  {@link SelectorProvider#provider()} which is called by each ServerSocketChannel.open() otherwise.
+         *
+         *  See <a href="https://github.com/netty/netty/issues/2308">#2308</a>.
+         */
+        return provider.openServerSocketChannel();
+    } catch (IOException e) {
+        throw new ChannelException(
+                "Failed to open a server socket.", e);
     }
+}
 ```
+
+### Netty怎么维护着所有的长连接？
+
+### Netty ByteBuf release怎么用？
+
+### 什么样的Handler可以用单例？
+
+### Netty性能极致优化指南
+1. 用@ChannelHandler.Sharable注解标识单例Handler
+2. 

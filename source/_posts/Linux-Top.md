@@ -4,7 +4,7 @@ date: 2018-09-26 12:42:06
 tags:
 ---
 
-用top -H定位RocketMQ最耗CPU的线程在做什么事情
+用`top -H + jstack`定位RocketMQ最耗CPU的线程在做什么事情
 ```
 top -H
 

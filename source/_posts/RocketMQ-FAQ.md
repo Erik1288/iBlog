@@ -236,10 +236,20 @@ http://www.jianshu.com/p/5ab57182af89?utm_campaign=maleskine&utm_content=note&ut
 ![image.png](http://processon.com/chart_image/5b892eb9e4b0bd4db926c7a4.png?=1)
 
 ### 怎么保证同步刷盘也有效率？
-GroupCommit
+发送消息的并发线程非常多，但是CommitLog只有一个，要想顺序写入内存然后刷盘必须上锁串行化（串行化后，磁盘IO竞争小）。串行排队等待刷盘的消息非常非常多，肯定要进行批处理，GroupCommit就是这个思想。GroupCommit首先处理队列A那些已经轮到的消息，当等待排队的刷盘的消息过来后，先把它们放到队列B中，等A中的所有消息都持久化后，锁住队列B，不让消息再进来，处理队列B，让刚刚空的队列A去接受之后排队的消息。
+
 批量一次性全部刷盘
 
 ### RocketMQ QueueSelector怎么应对Topic的ConsumeQueue扩容？
 ```
 Although it’s possible to increase the number of partitions over time, one has to be careful if messages are produced with keys. When publishing a keyed message, Kafka deterministically maps the message to a partition based on the hash of the key. This provides a guarantee that messages with the same key are always routed to the same partition. This guarantee can be important for certain applications since messages within a partition are always delivered in order to the consumer. If the number of partitions changes, such a guarantee may no longer hold. To avoid this situation, a common practice is to over-partition a bit.
 ```
+
+### 消费情况
+producerGroup只是往topic发送消息。consumerGroup只是消费topic。在broker端，消费的key为topic@consumerGroup，消费的offset取决于consumer设置的，CONSUME_FROM_LAST_OFFSET，CONSUME_FROM_FIRST_OFFSET,CONSUME_FROM_TIMESTAMP
+.CONSUME_FROM_TIMESTAMP在实际应用中还是比较少的使用。这三个区别是什么呢？
+1. 假如consumer配置为cluster模式，相同的consumerGroup，且设置客户端消费offset为CONSUME_FROM_FIRST_OFFSET，
+假如topic T的队列1的maxoffset为100，那么consumerA在启动后的队列1的消费是从0消费到100，consumerB在启动后的队列1也会从0消费到100。后续的消息即要么consumerA，要么consumerB消费。
+如果客户端设置的offset为CONSUME_FROM_LAST_OFFSET，那么consumerB在启动后的队列1是从100开始消费。后续消息消费方式相同。
+CONSUME_FROM_TIMESTAMP表示从0到100之间的某个时间点后开始消费。
+2. 假如consumer配置为cluster模式，不同的consumerGroup，这种情况的消费和广播模式一样。也就是说，后续的消息，不同的组都会收到。唯一区别在于，广播模式把已消费的进度信息保存在consumer的机器上，而集群模式保存在broker上。

@@ -5,6 +5,9 @@ tags:
 ---
 
 
+### 写得超赞
+https://www.cnblogs.com/iceAeterNa/p/4877549.html
+
 Universe::initialize_heap() universe.cpp:755
 universe_init() universe.cpp:672
 init_globals() init.cpp:110
