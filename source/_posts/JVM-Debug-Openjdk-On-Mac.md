@@ -4,6 +4,8 @@ date: 2017-12-08 12:54:59
 tags:
 ---
 
+### hotspot官方调试工具——hsdb
+http://www.bubuko.com/infodetail-1858803.html
 
 ### 大神博客
 http://rednaxelafx.iteye.com/
