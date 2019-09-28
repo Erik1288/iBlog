@@ -1,7 +1,7 @@
 ---
 title: JVM-Native-memory-tracker
 date: 2018-09-25 20:04:32
-tags:
+tags: JVM
 ---
 
 Java内存之本地内存分析神器： NMT 和 pmap

@@ -58,6 +58,8 @@ jemalloc的实现，要远比Netty4复杂，一个是系统层的，一个则是
 
 以下内容所参考的代码是`netty-4.0.15.Final`。
 
+Arena其实就是预先分配好的一个区域的内存。
+
 Netty4中，内存池管理的入口点是`PooledByteBufAllocator`。在该实现中，除了Arena和Page之外，
 还一个Chunk的概念。一个Arena由多个Chunk组成，而Chunk则由N个Page组成。
 
@@ -223,3 +225,42 @@ private static final int ST_ALLOCATED_SUBPAGE = ST_ALLOCATED | 1;
 # 其它
 
 ## ByteBuf实例缓存
+
+
+
+
+``` PoolChunk.java
+ * For simplicity all sizes are normalized according to PoolArena#normalizeCapacity method
+ * This ensures that when we request for memory segments of size >= pageSize the normalizedCapacity
+ * equals the next nearest power of 2
+ *
+ * To search for the first offset in chunk that has at least requested size available we construct a
+ * complete balanced binary tree and store it in an array (just like heaps) - memoryMap
+ *
+ * The tree looks like this (the size of each node being mentioned in the parenthesis)
+ *
+ * depth=0        1 node (chunkSize)
+ * depth=1        2 nodes (chunkSize/2)
+ * ..
+ * ..
+ * depth=d        2^d nodes (chunkSize/2^d)
+ * ..
+ * depth=maxOrder 2^maxOrder nodes (chunkSize/2^{maxOrder} = pageSize)
+ *
+ * depth=maxOrder is the last level and the leafs consist of pages
+```
+
+
+###
+Netty 内存分配
+- ByteBuf 分类
+- 内存规格是什么样的
+- 缓存数据结构
+- directArena 分配 direct 内存的流程
+- 从对象池里面拿到 PooledByteBuf 进行复用
+- 从缓存上进行内存分配
+- 从内存堆里面进行分配
+- arena、chunk、page、subpage之间的关系是什么？Netty 是如何维护他们之间的关系
+- page 是如何进行内存划分的
+- subpage 又是如何进行内存划分的
+- ByteBuf 的回收

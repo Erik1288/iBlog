@@ -8,7 +8,7 @@ tags: RocketMQ
 ### ProcessOn配图
 https://processon.com/diagraming/5be3a0d4e4b0ad314e823909
 
-#### RocmetMQ的IndexService设计原理
+#### RocmetMQ的IndexService设计原理  
 
 ![你想输入的替代文字](RocketMQ-Index-service/index-file.gif)
 

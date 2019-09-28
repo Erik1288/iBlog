@@ -1,7 +1,7 @@
 ---
 title: JVM-Crash-Log-Analysis
 date: 2018-01-11 14:39:37
-tags:
+tags: JVM
 ---
 
 http://www.javaranger.com/archives/1636

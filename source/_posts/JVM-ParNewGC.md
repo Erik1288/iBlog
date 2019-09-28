@@ -1,7 +1,7 @@
 ---
 title: JVM-ParNewGC
 date: 2018-10-12 10:05:19
-tags:
+tags: JVM
 ---
 
 ```

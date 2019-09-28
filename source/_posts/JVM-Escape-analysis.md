@@ -1,7 +1,7 @@
 ---
 title: JVM-Escape-analysis
 date: 2018-10-04 15:46:42
-tags:
+tags: JVM
 ---
 
 https://blog.csdn.net/blueheart20/article/details/52050545

@@ -153,6 +153,9 @@ zeroProxy.out(25086)─┬─{zeroProxy.out}(25087)
 #### 显示system call
 ```
 strace - trace system calls and signals
+
+$strace -f java -cp . ContextSwitchTest
+https://www.cnblogs.com/softidea/p/5873305.html
 ```
 
 
@@ -188,6 +191,9 @@ vda               2.06     0.00   94.85    0.00 50969.07     0.00   537.39     9
 ```
 
 ```
+
+### ps -eo pid,lstart|grep 26251
+查看进程的启动时间
 
 ### dstat -cldny 性能观察综合神器
 ```

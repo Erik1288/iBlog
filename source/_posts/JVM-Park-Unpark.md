@@ -1,7 +1,7 @@
 ---
 title: JVM-Park-Unpark
 date: 2018-08-15 09:52:45
-tags:
+tags: JVM
 ---
 
 Java并发的工具非常多，但是底层都是基于sun.misc.Unsafe#park和sun.misc.Unsafe#unpark这两个native，本文就来研究下究竟park和unpark表达的语义是什么。

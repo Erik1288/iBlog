@@ -4,6 +4,9 @@ date: 2017-11-06 10:16:02
 tags: JVM
 ---
 
+### 里面对锁升级的描述的图挺好的
+https://www.jianshu.com/p/36eedeb3f912
+
 ```
 abstract static class Sync extends AbstractQueuedSynchronizer {
         private static final long serialVersionUID = -5179523762034025860L;

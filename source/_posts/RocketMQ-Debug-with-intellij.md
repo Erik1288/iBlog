@@ -18,6 +18,8 @@ tags: RocketMQ
 
 ### Name Server
 
+vm options: -Drocketmq.home.dir=/Users/eric/Code/middleware/rocketmq
+
 ### Broker
 Broker的调试最为麻烦，
 如果在学习RocketMQ的初期，建议单启动一个Broker，减少复杂度，关注主要流程代码。
@@ -31,8 +33,8 @@ Port的分离可以放在不同的配置文件中：broker-a.properties，broker
 #### Master Broker
 
 ```
-VM options:-Drocketmq.home.dir=/Users/eric/Code/middleware/incubator-rocketmq -Drocketmq.namesrv.addr=mac:9876 -Duser.home=/Users/eric/store/master
-Program arguments:-c /Users/eric/Code/middleware/incubator-rocketmq/conf/2m-2s-sync/broker-a.properties
+VM options:-Drocketmq.home.dir=/Users/eric/Code/middleware/rocketmq -Drocketmq.namesrv.addr=mac:9876 -Duser.home=/Users/eric/store/master
+Program arguments:-c /Users/eric/Code/middleware/rocketmq/distribution/conf/2m-noslave/broker-a.properties
 
 broker-a.properties:
 brokerClusterName=DefaultCluster
@@ -63,6 +65,9 @@ brokerRole=SLAVE
 flushDiskType=ASYNC_FLUSH
 listenPort=22222
 ```
+
+### Producer
+VM options: -Drocketmq.client.logRoot=/Users/eric/store/master/logs/consume/
 
 ![image.png](http://upload-images.jianshu.io/upload_images/716353-473218e8e6936674.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 

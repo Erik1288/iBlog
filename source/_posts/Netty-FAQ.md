@@ -4,8 +4,22 @@ date: 2017-10-16 14:25:04
 tags: Netty
 ---
 
+
+
+### 这篇文章好好研究下
+https://github.com/fengjiachun/Jupiter/blob/master/docs/static_files/high_performance_rpc_with_netty.md
+
+https://www.infoq.cn/article/netty-million-level-push-service-design-points
+
 ### 怎么样的情况下，netty会发生内存泄露，应该怎么样去检测内存泄露，应该要怎么样处理？
 https://www.jianshu.com/p/73fff8e09fed
+如果我们的Handler对消息进行了处理，但是没有把消息往Pipeline的tail节点传递，那么就没有办法调用到Tail中`ReferenceCountUtil.release(msg);`导致内存泄露。
+但是使用SimpleChannelInboundHandler就会帮助我们避免这个问题
+
+### Netty PooledByteBufAllocator会创建多大的堆外内存？
+
+
+
 
 ### 重要概念 Future and Promise
 
@@ -13,7 +27,11 @@ https://www.jianshu.com/p/73fff8e09fed
 
 bytes and messages.
 
-### 如何调试时间循环线程（自己总结的，精彩）
+
+### Netty采坑之： ctx.channel().writeAndFlush 和 ctx.writeAndFlush 的区别
+https://blog.csdn.net/FishSeeker/article/details/78447684
+
+### 如何调试事件循环线程（自己总结的，精彩）
 当我们用debug启动netty server时，我们不知道boss线程运行的代码，那怎么样才能发现boss线程当前的执行轨迹呢。如果能找到轨迹，对我们研究boss线程有非常大的帮助。
 
 给boss时间循环线程池起个名字
@@ -27,7 +45,7 @@ bytes and messages.
 ```
 如果用的Intellij，就能实现这个效果，首先用debug模式启动netty server。在debug tag下，我们进入Threads，展开**Thread Group "main"**，发现**boss-event-loop**正在处于Running状态。选中**boss-event-loop**，右键点击**suspend**，之后就能看到代码停了下来，去**Frames**tab中选择某一行进行断点调试。
 
-### 聊天程序
+### 聊天程序，推送技术
 Web Socket技术
 Long Pooling技术
 
@@ -116,4 +134,4 @@ private static ServerSocketChannel newSocket(SelectorProvider provider) {
 
 ### Netty性能极致优化指南
 1. 用@ChannelHandler.Sharable注解标识单例Handler
-2. 
+2. EpollEventLoop

@@ -1,8 +1,12 @@
 ---
 title: JVM-GC-log
 date: 2018-12-03 19:24:49
-tags:
+tags: JVM
 ---
+
+
+### 知乎大神
+https://www.zhihu.com/question/57722838
 
 ```
 root     28033  169 73.9 1099400184 48649296 ? Sl   Sep25 169373:13 /bin/java -server -Xms8g -Xmx8g -Xmn4g -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -XX:SurvivorRatio=8 -XX:+DisableExplicitGC -XX:+ParallelRefProcEnabled -XX:ConcGCThreads=8 -XX:ParallelGCThreads=8 -XX:+PrintFlagsFinal -XX:+PrintReferenceGC -XX:+PrintTenuringDistribution -XX:+PrintHeapAtGC -verbose:gc -Xloggc:/opt/logs/rocketmq/mq_gc_%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:-UseBiasedLocking -Djava.ext.dirs=/opt/app/rocketmq/bin/../lib -cp .:/opt/app/rocketmq/bin/../conf: com.alibaba.rocketmq.broker.BrokerStartup -c /opt/app/rocketmq/conf/broker-bb.properties

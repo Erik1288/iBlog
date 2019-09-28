@@ -15,6 +15,9 @@ HashMap
 
 HashMap
 
+### HashMap resize() 扩容
+https://blog.csdn.net/aichuanwendang/article/details/53317351
+
 HashMap的工作原理是什么
 hashmap在 扩容 时为什么是乘以2. newCap = oldCap << 1 ，看看是不是和旧数据在新的Map中是否要产生偏移相关，不然所有的数据都挤在数组的前段。
 内部的数据结构是什么

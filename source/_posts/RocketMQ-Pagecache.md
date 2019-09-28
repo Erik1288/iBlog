@@ -4,6 +4,8 @@ date: 2018-08-11 15:46:50
 tags:
 ---
 
+### RocketMQ对
+
 
 ```
 man free
@@ -56,3 +58,74 @@ pagecache是RocketMQ高性能实现上使用的一个利器。虽然源码中没
 |---------------------------------------------------------+----------------+------------+-----------+---------|
 ```
 可以看到`/opt/data/rocketmq/store/commitlog/00000000335007449088`有11.182%都被cache了
+
+
+
+```
+public void warmMappedFile(FlushDiskType type, int pages) {
+    long beginTime = System.currentTimeMillis();
+    ByteBuffer byteBuffer = this.mappedByteBuffer.slice();
+    int flush = 0;
+    long time = System.currentTimeMillis();
+    for (int i = 0, j = 0; i < this.fileSize; i += MappedFile.OS_PAGE_SIZE, j++) {
+        byteBuffer.put(i, (byte) 0);
+        // force flush when flush disk type is sync
+        if (type == FlushDiskType.SYNC_FLUSH) {
+            if ((i / OS_PAGE_SIZE) - (flush / OS_PAGE_SIZE) >= pages) {
+                flush = i;
+                mappedByteBuffer.force();
+            }
+        }
+
+        // prevent gc
+        if (j % 1000 == 0) {
+            log.info("j={}, costTime={}", j, System.currentTimeMillis() - time);
+            time = System.currentTimeMillis();
+            try {
+                Thread.sleep(0);
+            } catch (InterruptedException e) {
+                log.error("Interrupted", e);
+            }
+        }
+    }
+
+    // force flush when prepare load finished
+    if (type == FlushDiskType.SYNC_FLUSH) {
+        log.info("mapped file warm-up done, force to disk, mappedFile={}, costTime={}",
+            this.getFileName(), System.currentTimeMillis() - beginTime);
+        mappedByteBuffer.force();
+    }
+    log.info("mapped file warm-up done. mappedFile={}, costTime={}", this.getFileName(),
+        System.currentTimeMillis() - beginTime);
+
+    this.mlock();
+}
+
+public void mlock() {
+        final long beginTime = System.currentTimeMillis();
+        final long address = ((DirectBuffer) (this.mappedByteBuffer)).address();
+        Pointer pointer = new Pointer(address);
+        {
+            int ret = LibC.INSTANCE.mlock(pointer, new NativeLong(this.fileSize));
+            log.info("mlock {} {} {} ret = {} time consuming = {}", address, this.fileName, this.fileSize, ret, System.currentTimeMillis() - beginTime);
+        }
+
+        {
+            int ret = LibC.INSTANCE.madvise(pointer, new NativeLong(this.fileSize), LibC.MADV_WILLNEED);
+            log.info("madvise {} {} {} ret = {} time consuming = {}", address, this.fileName, this.fileSize, ret, System.currentTimeMillis() - beginTime);
+        }
+    }
+```
+这个写入一个随机值，告诉内核，强制让内核发生缺页中断，去做虚拟内存和物理内存的mapping。注意，这个是给预创建的Commit Log。即使做了mapping，这部分的内存物理内存还是会变冷（LRU），还是有可能被内核回收走，干别的事情。这时要调用 mlock，告诉内核，这部分虚拟内存mapping的物理内存，千万别swap out 到swap区域，要持续放入物理内存中。madvise 传入will_need是高速操作系统，这块内存我等下就要使用，即使我暂时不用，也不要让它变冷，而被回收走。
+
+
+
+在 2018年4月8日 上午10:07，Zhanhui Li <lizhanhui@apache.org>写道：
+
+> writeBuffer 是预分配的anonymous pages, 并且mlock到物理内存了. 往里面写消息,
+不会因为内存不足回收带来延迟.
+> mmap的文件page cache, 在物理内存分配过快, background reclaim速度跟不上的时候,
+线程会被block住,进行direct reclaim, 带来延迟.
+>
+> 可参考:  https://events.static.linuxfound.org/sites/events/
+> files/lcjp13_moriya.pdf

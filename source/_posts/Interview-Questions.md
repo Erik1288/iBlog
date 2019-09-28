@@ -5,6 +5,15 @@ tags: 面试
 ---
 
 
+### 高阶面试题集合
+https://www.bookstack.cn/books/system-design
+
+### 优秀文章
+https://www.jianshu.com/p/5c926f878c96
+
+https://github.com/xingshaocheng/architect-awesome/blob/master/README.md
+
+
 ### 如果让你设计一个异步调用的服务，你会注意些什么？
 
 异步结果（Future & Promise）设计

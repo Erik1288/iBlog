@@ -4,6 +4,14 @@ date: 2018-08-29 09:31:23
 tags:
 ---
 
+在一个高级语言中编程，理论上你只要把两个变量A和B定义在相邻的位置，就有可能公用同一个Cacheline。
+如果变量A的值被修改，OS会将整块Cacheline都置为失效，变量B在Cache中的值自然也失效了。
+如果要告诉JVM，定义在相邻位置的变量不要放在一个Cacheline中，那么需要使用Padding方式将变量相隔开。
+
+
+### linux cacheline
+cat /sys/devices/system/cpu/cpu1/cache/index0/coherency_line_size 
+
 
 ### 怎么写一个程序证明Cacheline在起作用
 http://processon.com/chart_image/5b85fd4ce4b06fc64ad9ebf5.png

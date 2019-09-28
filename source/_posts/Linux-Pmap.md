@@ -7,6 +7,10 @@ tags:
 
 http://man.linuxde.net/pmap
 
+
+### 还有这种东西啊。。。
+http://makelinux.net/kernel_map/
+
 用pmap来查看mmap堆外内存
 
 ```

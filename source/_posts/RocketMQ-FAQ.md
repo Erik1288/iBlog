@@ -4,13 +4,14 @@ date: 2017-08-09 14:42:53
 tags: RocketMQ
 ---
 
-工作和学习中使用RocketMQ产生的困惑和总结，属于临时半成品文章，整理完了会单独成文。
-
 > 先来一个图，总结得非常好
 
 https://blog.csdn.net/qq_27529917/article/details/79595395
 https://upload-images.jianshu.io/upload_images/6302559-48fbc4f75fbf2412.png
 
+### 顺序消息是怎么实现的？
+消息的重复消费是不可避免的，但是消息的顺序需要保证。
+a b c d e -> a a b c d eee，但是不能a c b d e
 
 ### RocketMQ与Kafka架构上的巨大差异 -- CommitLog与ConsumeQueue
 https://blog.csdn.net/chunlongyu/article/details/54576649
@@ -24,9 +25,15 @@ https://blog.csdn.net/chunlongyu/article/details/54576649
 虽然每个文件是顺序IO，但topic或者partition过多，每个文件的顺序IO，表现到磁盘上，还是随机IO。
 ```
 
-### 为什么RocketMQ性能很高？
+### RMQ的Name Server怎么动态扩展？
 
-主要还是得益于存储模型，利用磁盘顺序读写性能远高于随机读写的特性。
+### RMQ的Broker怎么动态扩展？
+
+### msgId和offsetMsgId的区别
+对于客户端来说msgId是由客户端producer实例端生成的（具体来说，调用“MessageClientIDSetter.createUniqIDBuffer()”方法生成唯一的Id），offsetMsgId是由服务端Broker端在写入消息时生成的（采用“IP地址+Port端口”与“CommitLog的物理偏移量地址”做了一个字符串拼接），其中offsetMsgId就是我们在rocketMQ控制台直接输入查询的那个messageId。
+
+### 异步刷盘，CommitLog和ConsumeQueue哪一个先落盘？
+当消息放到了commitlog 的page cache（即没有刷盘）后，异步写入consumequeue。从逻辑上来讲，consumequeue的构建是依赖commitlog 的，但是由于刷盘是异步的，所以落盘的顺序是不一定的。
 
 ### MQ为什么内部要使用好多队列？
 
@@ -102,7 +109,7 @@ public void run() {
 
 1. 一个consume_group一开始订阅了*tag，之后加了具体的，会发生什么。
 
-### afka的发送消息性能非常高，常用于日志缓冲，是不是用「Oneway」的方式？不然producer发送请求，broker处理请求，producer接受响应，这三段的时间是无论如何都无法缩减的。
+### kafka的发送消息性能非常高，常用于日志缓冲，是不是用「Oneway」的方式？不然producer发送请求，broker处理请求，producer接受响应，这三段的时间是无论如何都无法缩减的。
 
 ### RocketMQ的事务消息是什么？
 看到一段描述很有趣，当发送了分布式事务消息时，如果Producer因为意外宕机，Broker会回调Producer Group的另一一台Producer来确认事务状态。
@@ -146,6 +153,8 @@ public void run() {
 
 可以
 
+### CommitLog和ConsumeQueue在非正常关机下变得不一致，如何恢复？
+
 ### ReputMessageService中空转监听是Commitog的offset，当有新的消息时，先是构建consume queue，然后通知PullMessageHoldService，那整个过程在哪里对消息进行过滤，过滤用的是tag，consume queue中也有tag的hash，是不是只需要对比这两个值就好？
 5. 如果一个4G的文件用mmap映射到Java的MappedByteBuffer中，是绝对不可能整体加载进内存的。一个ByteBuffer就是一个有限的byte数组，但是，我们理论上可以在这个数组的任何位置（position）对数组进行读和写，然后映射进文件。如果OS能预感到我们的文件是顺序读写的，那么内存到文件的速度会非常快，如果是随机的，OS没法预测下次的读写位置，这样速度会变慢（这部分去查询下）
 6. PullConsumer：用consumer.pull(MessageQueue mq, String subExpression, long offset, int maxNums)方法去获取Broker的消息，如果第一次offset传了0，获取到了数据，第二次还是传0，还是能获取到数据，是什么原因？Broker的consumerOffset.json为什么不起作用？Pull和Push消费到的点什么时候会被persist到config/consumerOffset.json?详见MQClientInstance.persistAllConsumerOffset会把offsetTable定时发到Broker。
@@ -153,6 +162,7 @@ public void run() {
 ### 程序中处理MappedByteBuffer要特别注意些什么？
 
 A MemoryMappedBuffer has a fixed size, but the file it’s mapped to is elastic.所以一旦当前的程序（或者说当前的线程）对文件的内容失去了独占权，比如文件的内容被其它的线程改了，那原先的线程访问MappedByteBuffer对应位置的缓存就会抛出异常，所以，当我们要用MappedByteBuffer时，一定要确保在多线程下是互斥的。
+这个理解是不对的！！！！
 
 ### RocketMQ发送，接受消息的性能与队列数量的关系。
 
@@ -201,6 +211,8 @@ java.lang.ArrayIndexOutOfBoundsException: -521875234
 非常重要
 
 ### RocketMQ 业务KEY相同导致哈希冲突
+
+### RocketMQ的Commit log什么时候munmap
 
 ### RocketMQ协议
 

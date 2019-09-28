@@ -4,6 +4,22 @@ date: 2017-09-25 16:58:43
 tags: RocketMQ
 ---
 
+### 细节控
+https://www.jianshu.com/p/fac642f3c1af?utm_source=oschina-app
+```
+根据isTransferMsgByHeap的设置情况（默认为true），选择下面两种方式之一来真正读取GetMessageResult的消息内容并返回至Consumer端；
+方式1：使用JDK NIO的ByteBuffer，循环地读取存有消息内容的messageBufferList至堆内内存中，返回byte[]字节数组，并设置到响应的body中；然后，通过RPC通信组件—NettyRemotingServer发送响应至Consumer端；
+方式2：采用基于Zero-Copy的Netty组件的FileRegion，其包装的“FileChannel.tranferTo”实现文件传输，可以直接将文件缓冲区的数据发送至通信目标通道Channel中，避免了通过循环write方式导致的内存拷贝开销，这种方式性能上更优；
+
+作者：癫狂侠
+链接：https://www.jianshu.com/p/fac642f3c1af
+來源：简书
+简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。
+```
+
+### ProcessOn配图
+https://processon.com/diagraming/5badd204e4b075b9fe5b5d59
+
 
 以topic为维度，开始进行Rebalance
 以集群模式为例，先调用`List<String> cidAll = this.mQClientFactory.findConsumerIdList(topic, consumerGroup)`找到所有Consumer，然后根据topic路由信息，找到所有的MessageQueue。举个例子，有8个MessageQueue，4个Consumer,可以把MessageQueue理解为任务队列，4个Consumer大家一起分下任务，默认是平均分配（AllocateMessageQueueStrategy）策略，即说好，大家一人固定拉取并消费2个队列，如果队列的数量或者Consumer的数量不变，那这个关系就不要打破。可能有人要问了，这个给Consumer分配任务的工作，总得由一个老大哥（Leader）来执行吧，要么是Consumer里面有个Leader，要么是将该模块给集群协调者来做，不然怎么保证大家的分的方式都一样嘞。但RocketMQ恰恰是由每个Consumer各自都来做这个分配，秘诀在于下面两行代码

@@ -5,6 +5,10 @@ tags: 源码分析
 ---
 
 
+
+AQS使用一个int类型的成员变量state来表示同步状态，当`state > 0`时表示已经获取了锁，当`state = 0`时表示释放了锁。它提供了三个方法（getState()、setState(int newState)、compareAndSetState(int expect,int update)）来对同步状态state进行操作，当然AQS可以确保对state的操作是安全的。
+AQS通过内置的FIFO同步队列来完成资源获取线程的排队工作，如果当前线程获取同步状态失败（锁）时，AQS则会将当前线程以及等待状态等信息构造成一个节点（Node）并将其加入同步队列，同时会阻塞当前线程，当同步状态释放时，则会把节点中的线程唤醒，使其再次尝试获取同步状态。
+
 http://guochenglai.com/2016/06/06/java-concurrent5-aqs-code-analysis/
 
 ### 基于AQS的公平与非公平锁设计
