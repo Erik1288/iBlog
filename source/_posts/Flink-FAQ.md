@@ -4,73 +4,66 @@ date: 2018-12-28 07:29:22
 tags:
 ---
 
+### 超高质量文章
+https://mlog.club/articles/tag/2178
 
-Flink是将Batch Processing和Stream Processing合二为一的分布式计算系统
+### 很多好问题
+https://mlog.club/article/40687
+https://www.aboutyun.com/thread-27738-1-1.html
 
-Batch Processing看重的是吞吐量
-Stream Processing看重的是低延时
-这个它是怎么权衡的
+### 
+https://blog.csdn.net/fct2001140269/article/details/87357949
 
-TaskNamager中的taskSlot为什么是1？
+### 现在要处理一批数据，KeyBy(entityId)后，发现某几个entityId数据量特别大，可能是其它的好几倍，怎么处理？
 
-flink的日志是怎么输出的？
+### 当Flink的Checkpoint非常大时，怎么样进行低延时保存？
+https://www.ververica.com/blog/managing-large-state-apache-flink-incremental-checkpointing-overview
 
-CheckpointingMode
-```
-/**
- * The checkpointing mode defines what consistency guarantees the system gives in the presence of
- * failures.
- *
- * <p>When checkpointing is activated, the data streams are replayed such that lost parts of the
- * processing are repeated. For stateful operations and functions, the checkpointing mode defines
- * whether the system draws checkpoints such that a recovery behaves as if the operators/functions
- * see each record "exactly once" ({@link #EXACTLY_ONCE}), or whether the checkpoints are drawn
- * in a simpler fashion that typically encounters some duplicates upon recovery
- * ({@link #AT_LEAST_ONCE})</p>
- */
-@Public
-public enum CheckpointingMode {
+### 这个例子就没有并发问题么？
+https://training.ververica.com/exercises/rideEnrichment-flatmap.html
 
-	/**
-	 * Sets the checkpointing mode to "exactly once". This mode means that the system will
-	 * checkpoint the operator and user function state in such a way that, upon recovery,
-	 * every record will be reflected exactly once in the operator state.
-	 *
-	 * <p>For example, if a user function counts the number of elements in a stream,
-	 * this number will consistently be equal to the number of actual elements in the stream,
-	 * regardless of failures and recovery.</p>
-	 *
-	 * <p>Note that this does not mean that each record flows through the streaming data flow
-	 * only once. It means that upon recovery, the state of operators/functions is restored such
-	 * that the resumed data streams pick up exactly at after the last modification to the state.</p>
-	 *
-	 * <p>Note that this mode does not guarantee exactly-once behavior in the interaction with
-	 * external systems (only state in Flink's operators and user functions). The reason for that
-	 * is that a certain level of "collaboration" is required between two systems to achieve
-	 * exactly-once guarantees. However, for certain systems, connectors can be written that facilitate
-	 * this collaboration.</p>
-	 *
-	 * <p>This mode sustains high throughput. Depending on the data flow graph and operations,
-	 * this mode may increase the record latency, because operators need to align their input
-	 * streams, in order to create a consistent snapshot point. The latency increase for simple
-	 * dataflows (no repartitioning) is negligible. For simple dataflows with repartitioning, the average
-	 * latency remains small, but the slowest records typically have an increased latency.</p>
-	 */
-	EXACTLY_ONCE,
 
-	/**
-	 * Sets the checkpointing mode to "at least once". This mode means that the system will
-	 * checkpoint the operator and user function state in a simpler way. Upon failure and recovery,
-	 * some records may be reflected multiple times in the operator state.
-	 *
-	 * <p>For example, if a user function counts the number of elements in a stream,
-	 * this number will equal to, or larger, than the actual number of elements in the stream,
-	 * in the presence of failure and recovery.</p>
-	 *
-	 * <p>This mode has minimal impact on latency and may be preferable in very-low latency
-	 * scenarios, where a sustained very-low latency (such as few milliseconds) is needed,
-	 * and where occasional duplicate messages (on recovery) do not matter.</p>
-	 */
-	AT_LEAST_ONCE
-}
-```
+### Flink与Kafka融合时，Kafka的游标时怎么管理的？
+
+
+### Sliding Window的数据复制
+Sliding Windows Make Copies
+Sliding window assigners can create lots of window objects, and will copy each event into every relevant window. For example, if you have sliding windows every 15 minutes that are 24-hours in length, each event will be copied into 4 * 24 = 96 windows.
+
+### 
+msg1,t1
+msg2,t2
+msg3,t3
+msg4,t4
+...
+以这个顺序进入Flink
+msg1,t1
+msg2,t2
+msg4,t4
+msg5,t5
+msg6,t6
+msg7,t7
+...
+10条
+...
+msg3,t3
+### 有一个作业是去统计一个超级大的文件的单词出现的次数，这个文件需要被处理整整一个月，如果中间Streaming作业停掉了，那后续应该怎么恢复才能达到exactly once？因为这个作业的源没有像Kafka那样有下标。
+
+### Flink的slot指的是什么？和线程是什么关系？
+按照我现在的理解，10个Slot并不是说有10个线程在执行，而是10个并行线。
+
+source -> map -> aggregation -> sink
+
+### KeyBy修改了并行度后，并行线会发生变化么？
+
+###
+
+### Flink是怎么实现Exactly once？和Kafka有什么区别？
+https://mp.weixin.qq.com/s/4EtkNns-KAzEqL3GRMRLAg
+StreamingFileSink
+
+### 一个flink的并行任务，对于每一个taskSlot，它保存的是自己Keyed到的State，如果修改了并行度，State怎么变化？
+
+### 如果Kafka的Topic有10个Partition，那Source的时候，设置多少的并行度比较合适？
+
+### 如果已知Kafka的Topic已经按照Entity做了Partition，这个时候Flink的Source是和这个Topic并行的么？

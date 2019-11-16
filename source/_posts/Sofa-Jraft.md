@@ -60,3 +60,5 @@ public void onEvent(LogEntryAndClosure event, long sequence, boolean endOfBatch)
 ## Leader成功应用状态机，将commitIndex通过心跳传递给Follow，Follow开始应用状态机。
 
 ## Follow什么时候需要被安装Snapshot，怎么安装？
+
+## 如果Leader挂了，可能有一些废弃的LocalLog，怎么Trancate掉？

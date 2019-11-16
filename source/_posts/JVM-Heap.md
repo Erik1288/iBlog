@@ -47,7 +47,7 @@ CollectedHeap* Universe::create_heap() {
 }
 ```
 
-```
+``` c++
 jint GenCollectedHeap::initialize() {
   CollectedHeap::pre_initialize();
 
