@@ -16,12 +16,166 @@ lock synchronized {
 }
 
 ### Kafka Consumer Rebalance流程是怎么样的？
+1. Consumer查找GroupCoordinator，向它发送Join请求
+2. Broker收到Join请求后，创建一个Group，并且把创建的Consumer作为Consumer的Leader
+```
+// @ kafka.coordinator.group.GroupMetadata#add
+def add(member: MemberMetadata) {
+  if (members.isEmpty)
+    this.protocolType = Some(member.protocolType)
+
+  assert(groupId == member.groupId)
+  assert(this.protocolType.orNull == member.protocolType)
+  assert(supportsProtocols(member.protocols))
+
+  if (leaderId.isEmpty)
+    leaderId = Some(member.memberId)
+  members.put(member.memberId, member)
+}
+```
+3. Broker并不会直接给发送Join请求的Consumer响应，而是会启动延时任务，等待一段时间，然后再给所有的Consumer响应
+```
+// @ kafka.coordinator.group.GroupCoordinator#prepareRebalance
+private def prepareRebalance(group: GroupMetadata) {
+  // if any members are awaiting sync, cancel their request and have them rejoin
+  if (group.is(AwaitingSync))
+    resetAndPropagateAssignmentError(group, Errors.REBALANCE_IN_PROGRESS)
+
+  val delayedRebalance = if (group.is(Empty))
+    new InitialDelayedJoin(this,
+      joinPurgatory,
+      group,
+      groupConfig.groupInitialRebalanceDelayMs,
+      groupConfig.groupInitialRebalanceDelayMs,
+      max(group.rebalanceTimeoutMs - groupConfig.groupInitialRebalanceDelayMs, 0))
+  else
+    new DelayedJoin(this, group, group.rebalanceTimeoutMs)
+
+  group.transitionTo(PreparingRebalance)
+
+  info(s"Preparing to rebalance group ${group.groupId} with old generation ${group.generationId} " +
+    s"(${Topic.GROUP_METADATA_TOPIC_NAME}-${partitionFor(group.groupId)})")
+
+  val groupKey = GroupKey(group.groupId)
+  joinPurgatory.tryCompleteElseWatch(delayedRebalance, Seq(groupKey))
+}
+```
+4. 各个Consumer收到来自Group coordinator的响应后，会查看自己是不是这个Consumer Group中的Consumer Leader
+```
+// @ org.apache.kafka.clients.consumer.internals.AbstractCoordinator.JoinGroupResponseHandler#handle
+AbstractCoordinator.this.generation = new Generation(joinResponse.generationId(),
+        joinResponse.memberId(), joinResponse.groupProtocol());
+if (joinResponse.isLeader()) {
+    onJoinLeader(joinResponse).chain(future);
+} else {
+    onJoinFollower().chain(future);
+}
+```
+5. 作为Leader的Consumer需要根据自己Rebalance算法，把rebalance的结果通过发送Sync请求反馈给Group Coordinator
+```
+// @ org.apache.kafka.clients.consumer.internals.AbstractCoordinator#onJoinLeader
+private RequestFuture<ByteBuffer> onJoinLeader(JoinGroupResponse joinResponse) {
+    try {
+        // perform the leader synchronization and send back the assignment for the group
+        Map<String, ByteBuffer> groupAssignment = performAssignment(joinResponse.leaderId(), joinResponse.groupProtocol(),
+                joinResponse.members());
+
+        SyncGroupRequest.Builder requestBuilder =
+                new SyncGroupRequest.Builder(groupId, generation.generationId, generation.memberId, groupAssignment);
+        log.debug("Sending leader SyncGroup to coordinator {}: {}", this.coordinator, requestBuilder);
+        return sendSyncGroupRequest(requestBuilder);
+    } catch (RuntimeException e) {
+        return RequestFuture.failure(e);
+    }
+}
+```
+6. 而那些普通的Consumer也需要发送一个空的Sync请求
+```
+// @ org.apache.kafka.clients.consumer.internals.AbstractCoordinator#onJoinFollower
+private RequestFuture<ByteBuffer> onJoinFollower() {
+    // send follower's sync group with an empty assignment
+    SyncGroupRequest.Builder requestBuilder =
+            new SyncGroupRequest.Builder(groupId, generation.generationId, generation.memberId,
+                    Collections.<String, ByteBuffer>emptyMap());
+    log.debug("Sending follower SyncGroup to coordinator {}: {}", this.coordinator, requestBuilder);
+    return sendSyncGroupRequest(requestBuilder);
+}
+```
+7. 所有的Consumer根据Sync请求的响应，更新自己的
+```
+// @ org.apache.kafka.clients.consumer.internals.AbstractCoordinator.SyncGroupResponseHandler#handle
+Errors error = syncResponse.error();
+if (error == Errors.NONE) {
+    sensors.syncLatency.record(response.requestLatencyMs());
+    future.complete(syncResponse.memberAssignment());
+}
+
+// @ org.apache.kafka.clients.consumer.internals.AbstractCoordinator#joinGroupIfNeeded
+void joinGroupIfNeeded() {
+    while (needRejoin() || rejoinIncomplete()) {
+        // ...
+
+        RequestFuture<ByteBuffer> future = initiateJoinGroup();
+        client.poll(future);
+
+        if (future.succeeded()) {
+            onJoinComplete(generation.generationId, generation.memberId, generation.protocol, future.value());
+
+            // We reset the join group future only after the completion callback returns. This ensures
+            // that if the callback is woken up, we will retry it on the next joinGroupIfNeeded.
+            resetJoinGroupFuture();
+            needsJoinPrepare = true;
+        } else {
+            // ...
+        }
+    }
+}
+
+// @ org.apache.kafka.clients.consumer.internals.ConsumerCoordinator#onJoinComplete
+protected void onJoinComplete(int generation,
+                              String memberId,
+                              String assignmentStrategy,
+                              ByteBuffer assignmentBuffer) {
+    // ...
+    Assignment assignment = ConsumerProtocol.deserializeAssignment(assignmentBuffer);
+
+    // ...
+
+    // update partition assignment
+    subscriptions.assignFromSubscribed(assignment.partitions());
+
+    // ...
+}
+```
 
 ### Kafka发送者怎么保证是有序的？
 MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION = 1， 为什么？
 不等于1的话，会有什么效果？
 
+### Consumer coordinator是什么？
+
+### Group coordinator是什么？
+
+### __consumer_offset的某一个partition挂了，kafka broker中的controller会给它选一个新的Leader，这个过程是怎么样的？
+
 ### Kafka Consumer关闭后，怎么触发Rebalance？
+``` 
+// @ org.apache.kafka.clients.consumer.internals.ConsumerCoordinator#needRejoin
+public boolean needRejoin() {
+    if (!subscriptions.partitionsAutoAssigned())
+        return false;
+
+    // we need to rejoin if we performed the assignment and metadata has changed
+    if (assignmentSnapshot != null && !assignmentSnapshot.equals(metadataSnapshot))
+        return true;
+
+    // we need to join if our subscription has changed since the last join
+    if (joinedSubscription != null && !joinedSubscription.equals(subscriptions.subscription()))
+        return true;
+
+    return super.needRejoin();
+}
+```
 
 ### Kafka创建Topic的过程，和我们想象中有点不一样
 1. 生成(topic, partition)replica的assignment
@@ -98,6 +252,33 @@ http://matt33.com/2017/10/22/consumer-join-group/
 1. rebalance
 2. 获取assign的(topic, partition)的消费位点
 3. 
+
+### Kafka Broker在做"Join Request"处理时，需要等待一个timeout的时间，好让所有相关的consumer都能来得及join进来？这个是怎么实现的？
+```
+private def prepareRebalance(group: GroupMetadata) {
+  // if any members are awaiting sync, cancel their request and have them rejoin
+  if (group.is(AwaitingSync))
+    resetAndPropagateAssignmentError(group, Errors.REBALANCE_IN_PROGRESS)
+
+  val delayedRebalance = if (group.is(Empty))
+    new InitialDelayedJoin(this,
+      joinPurgatory,
+      group,
+      groupConfig.groupInitialRebalanceDelayMs,
+      groupConfig.groupInitialRebalanceDelayMs,
+      max(group.rebalanceTimeoutMs - groupConfig.groupInitialRebalanceDelayMs, 0))
+  else
+    new DelayedJoin(this, group, group.rebalanceTimeoutMs)
+
+  group.transitionTo(PreparingRebalance)
+
+  info(s"Preparing to rebalance group ${group.groupId} with old generation ${group.generationId} " +
+    s"(${Topic.GROUP_METADATA_TOPIC_NAME}-${partitionFor(group.groupId)})")
+
+  val groupKey = GroupKey(group.groupId)
+  joinPurgatory.tryCompleteElseWatch(delayedRebalance, Seq(groupKey))
+}
+```
 
 ### 如果(topic, partiton)的leader在Broker3，Producer是怎么发送消息给Broker3的，是需要在启动的时候连接所有的Broker么？
 
