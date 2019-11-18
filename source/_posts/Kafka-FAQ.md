@@ -6,7 +6,6 @@ tags: Kafka
 ### 大量精品文章和面试问题
 https://blog.csdn.net/u013256816
 
-
 ### Kafka写CommitLog时用了什么锁机制?
 
 sync;lock-free;reentrant lock,用了哪一种？
@@ -157,6 +156,44 @@ MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION = 1， 为什么？
 ### Group coordinator是什么？
 
 ### __consumer_offset的某一个partition挂了，kafka broker中的controller会给它选一个新的Leader，这个过程是怎么样的？
+
+### 怎么获取Kafka Consumer的Lag
+
+### Kafka是怎么实现幂等的？
+Broker以(producer, topic, partition)为维度，维护一份Map</*(producer, topic, partition)*/, /*sequence*/>，Producer每发送一条消息(好像是以Batch为单位的??)，都会将sequence++；如果同一个Producer对于某一个(topic, partition)发送了两个sequence一样的消息，后面发送的那个将被丢弃掉。
+实现原理：
+)Producer在初始化时，会向Broker申请一个ProducerId
+)Broker处理ProducerId申请请求，从序列段中申请一个唯一ID
+)Producer在发送消息时，会将加一的sequence发在消息体中，一起发送
+```
+// @ org.apache.kafka.clients.producer.internals.RecordAccumulator#drain
+
+// Additionally, we update the next sequence number bound for the partition,
+// and also have the transaction manager track the batch so as to ensure
+// that sequence ordering is maintained even if we receive out of order
+// responses.
+batch.setProducerState(producerIdAndEpoch, transactionManager.sequenceNumber(batch.topicPartition), isTransactional);
+
+
+// @ org.apache.kafka.common.record.DefaultRecordBatch#incrementSequence
+static int incrementSequence(int baseSequence, int increment) {
+    if (baseSequence > Integer.MAX_VALUE - increment)
+        return increment - (Integer.MAX_VALUE - baseSequence) - 1;
+    return baseSequence + increment;
+}
+```
+)Broker如果收到了sequence一样的消息，丢弃后直接返回。
+```
+// @ 
+// if this is a client produce request, there will be up to 5 batches which could have been duplicated.
+// If we find a duplicate, we return the metadata of the appended batch to the client.
+if (isFromClient) {
+  maybeLastEntry.flatMap(_.findDuplicateBatch(batch)).foreach { duplicate =>
+    return (updatedProducers, completedTxns.toList, Some(duplicate))
+  }
+}
+```
+
 
 ### Kafka Consumer关闭后，怎么触发Rebalance？
 ``` 
