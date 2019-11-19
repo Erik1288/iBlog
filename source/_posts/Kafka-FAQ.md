@@ -147,6 +147,10 @@ protected void onJoinComplete(int generation,
 }
 ```
 
+### 怎么监控kafka page cache刷盘时间？
+
+### Kafka的Retention是怎么工作的？不符合retention的日志什么时候会被清理掉？
+
 ### Kafka发送者怎么保证是有序的？
 MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION = 1， 为什么？
 不等于1的话，会有什么效果？
@@ -546,6 +550,8 @@ broker1: Leader(1), AR(1, 2, 3)
 broker2: Follower(2), AR(1, 2, 3)
 broker3: Follower(3), AR(1, 2, 3)
 
+### Follower向Leader发送Fetch请求，HW是怎么在Follower和Leader之间传递的？
+
 ### 什么叫某个(topic, partition)的Preferred Leader？
 (topic, partition)的AR中的第一个元素就是Preferred Leader。
 
@@ -579,6 +585,11 @@ maybeDuplicate.foreach { duplicate =>
 Kafka本身有没有限流机制？
 
 ### Kafka的consumer的心跳线程做什么事情？只是检测存活么？
+
+### Kafka vagrant搭建
+vagrant box add \
+https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box \
+--name ubuntu/trusty64
 
 ### __consumer_offsets这个topic有什么特点？
 根据理解，说的越多越好
