@@ -5,6 +5,16 @@ tags: Kafka
 ---
 ### 大量精品文章和面试问题
 https://blog.csdn.net/u013256816
+比较好的总结
+https://juejin.im/post/5ddf5659518825782d599641?utm_source=gold_browser_extension
+
+### Kafka发送怎么保证顺序？
+
+### Kafka异步发送能不能保证顺序？
+
+### Kafka能不能保证不丢消息（只要多数机器不挂）？
+
+### Kafka能不能保证消费顺序？
 
 ### Kafka写CommitLog时用了什么锁机制?
 
@@ -13,6 +23,8 @@ sync;lock-free;reentrant lock,用了哪一种？
 kafka.log.Log#append
 lock synchronized {
 }
+
+### Kafka生产者批量发送了消息，那Broker是把消息一条一存么？
 
 ### Kafka Consumer Rebalance流程是怎么样的？
 1. Consumer查找GroupCoordinator，向它发送Join请求
@@ -149,6 +161,9 @@ protected void onJoinComplete(int generation,
 
 ### 怎么监控kafka page cache刷盘时间？
 
+
+### Kafka shallowOffset是什么意思？
+
 ### Kafka的Retention是怎么工作的？不符合retention的日志什么时候会被清理掉？
 
 ### Kafka发送者怎么保证是有序的？
@@ -162,6 +177,9 @@ MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION = 1， 为什么？
 ### __consumer_offset的某一个partition挂了，kafka broker中的controller会给它选一个新的Leader，这个过程是怎么样的？
 
 ### 怎么获取Kafka Consumer的Lag
+
+### Kafka是一个batch一压缩，还是一条消息一压缩？
+每一个消息都会压缩
 
 ### Kafka是怎么实现幂等的？
 Broker以(producer, topic, partition)为维度，维护一份Map</*(producer, topic, partition)*/, /*sequence*/>，Producer每发送一条消息(好像是以Batch为单位的??)，都会将sequence++；如果同一个Producer对于某一个(topic, partition)发送了两个sequence一样的消息，后面发送的那个将被丢弃掉。

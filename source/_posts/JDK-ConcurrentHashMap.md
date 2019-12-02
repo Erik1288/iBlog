@@ -4,7 +4,10 @@ date: 2019-11-25 17:05:54
 tags:
 ---
 
+
 ### 内部的talbe用volatile修饰，`volatile Node<K,V>[] table`，这样做是无法让多个线程在读取数组的某一个元素时有volatile的语义（内存可见性语义），那为什么还要加volatile关键字？
+
+在ConcurrentHashMap的内部数组长度达到loadFactor阈值时（数组长度不大，但也发生treefy的时候也有可能扩容），需要进行扩容，
 ```
 if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {
     try {

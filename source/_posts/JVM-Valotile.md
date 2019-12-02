@@ -7,9 +7,18 @@ tags: JVM
 ### 示例代码
 https://www.cnblogs.com/chenyangyao/p/5269622.html
 
+### Volatile的两层语义
 
-Valotile的两层语义
-### Memory bar
+### Volatile能不能实现原子性？
+看说的是什么原子性，如果是Access atomicity，那时可以的。如果是++的原子性，那时不行的。
+
+
+### 多线程程序产生顺序问题的原因
+1. CPU执行指令是Pipeline形式执行的，而不是一条条执行。在Pipeline模式下执行，任意一条指令的生效时间是不一样的
+2. 指令自身的优化，在单线程中没有前后依赖的变量读写，可以进行重排序优化。读操作往下优化，写错话往上优化。
+3. CacheLine
+
+
 
 https://www.jianshu.com/p/ef8de88b1343
 
