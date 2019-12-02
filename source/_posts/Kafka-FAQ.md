@@ -656,6 +656,7 @@ https://www.jianshu.com/p/833b64e141f8
 按照这个文章，好像说是在收到了 LeaderAndIsr的请求后？？？
 
 ### 什么时候 「谁」 会调用 「谁」 的ApiKeys.LEADER_AND_ISR?
+#### 场景1:ISR变动
 在每个Partition(.scala)中，在每次expandIsr或者shrinkIsr时，都需要在zk(/isr_change_notification)上记录，以此来达到事件传播(propagate)的效果。
 ```
 def maybeExpandIsr(replicaId: Int, logReadResult: LogReadResult): Boolean = {
@@ -746,7 +747,6 @@ case class IsrChangeNotification(sequenceNumbers: Seq[String]) extends Controlle
 }
 ```
 
-
 收到了controller发来的LeaderAndIsr请求，每个broker根据自身情况，让自己的ReplicaManager调用asLeader或者asFollower的响应
 ```
 def becomeLeaderOrFollower(correlationId: Int,
@@ -770,6 +770,22 @@ def becomeLeaderOrFollower(correlationId: Int,
     ...
   }
 }
+```
+#### 场景2:Leader变动
+在kafka中，存活的broker会在zk的session中保存(/brokers/ids)地址
+controller在onControllerFailover的registerBrokerChangeListener对上面的地址进行了监听。
+一旦有broker无法保持与zk的session，controller会找出与这台broker相关的，但是目前已经没有了leader的(topic, partition)。controller分别用状态机重置这些partition的状态。
+1. 首先将这些(topic, partition)的状态统一设置为`OfflinePartition`
+2. 然后将(topic, partition)的状态从`OfflinePartition`设置为`OnlinePartition`，这个过程会触发(topic, partition)的LeaderElection
+3. 最后再向相关的broker发送leaderAndIsr请求
+```
+// trigger OfflinePartition state for all partitions whose current leader is one amongst the newOfflineReplicas
+partitionStateMachine.handleStateChanges(partitionsWithoutLeader, OfflinePartition)
+// trigger OnlinePartition state changes for offline or new partitions
+// partition状态机从OfflinePartition->OnlinePartition过程会触发LeaderElection
+partitionStateMachine.triggerOnlinePartitionStateChange()
+// trigger OfflineReplica state change for those newly offline replicas
+replicaStateMachine.handleStateChanges(newOfflineReplicasNotForDeletion, OfflineReplica)
 ```
 
 ### Kafka中有哪些Coordinator?
