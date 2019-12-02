@@ -617,6 +617,18 @@ https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/vagrant/trusty/current/
 根据理解，说的越多越好
 1. compaction
 2. retention
+```
+createTopic(topic, config.offsetsTopicPartitions, config.offsetsTopicReplicationFactor.toInt,
+            groupCoordinator.offsetsTopicConfigs)
+
+def offsetsTopicConfigs: Properties = {
+  val props = new Properties
+  props.put(LogConfig.CleanupPolicyProp, LogConfig.Compact)
+  props.put(LogConfig.SegmentBytesProp, offsetConfig.offsetsTopicSegmentBytes.toString)
+  props.put(LogConfig.CompressionTypeProp, ProducerCompressionCodec.name)
+  props
+}
+```
 
 
 ### kafka的消费者Offset是KV Map形式的，是怎么被维护在以List形式的__consumer_offsets上？
