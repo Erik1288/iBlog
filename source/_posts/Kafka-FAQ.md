@@ -25,6 +25,10 @@ lock synchronized {
 }
 
 ### Kafka生产者批量发送了消息，那Broker是把消息一条一存么？
+不是，是把几条连续的消息存在一起，在外层公用同一个offset
+
+### kafka消费者fetch的消息正好在某个批次中间的消息，怎么办？
+
 
 ### Kafka Consumer Rebalance流程是怎么样的？
 1. Consumer查找GroupCoordinator，向它发送Join请求
@@ -633,7 +637,7 @@ while (currOffset < highWaterMark && !shuttingDown.get()) {
 是用到了，但是在哪里用到的？这里写得很清楚。
 https://www.jianshu.com/p/d47de3d6d8ac
 
-要使用sendfile，在各个平台没有统一的规定，甚至连引入的头文件都没有做规范。
+sendfile不是posix规范的api，要使用sendfile，在各个平台没有统一的规定，甚至连引入的头文件都没有做规范。
 FileChannelImpl.c
 
 #if defined(__linux__) || defined(__solaris__)
@@ -652,6 +656,121 @@ https://www.jianshu.com/p/833b64e141f8
 按照这个文章，好像说是在收到了 LeaderAndIsr的请求后？？？
 
 ### 什么时候 「谁」 会调用 「谁」 的ApiKeys.LEADER_AND_ISR?
+在每个Partition(.scala)中，在每次expandIsr或者shrinkIsr时，都需要在zk(/isr_change_notification)上记录，以此来达到事件传播(propagate)的效果。
+```
+def maybeExpandIsr(replicaId: Int, logReadResult: LogReadResult): Boolean = {
+  inWriteLock(leaderIsrUpdateLock) {
+    // check if this replica needs to be added to the ISR
+    leaderReplicaIfLocal match {
+      case Some(leaderReplica) =>
+          ...
+          // update ISR in ZK and cache
+          updateIsr(newInSyncReplicas)
+          ...
+        }
+        ...
+      case None => false // nothing to do if no longer leader
+    }
+  }
+}
+
+def maybeShrinkIsr(replicaMaxLagTimeMs: Long) {
+  val leaderHWIncremented = inWriteLock(leaderIsrUpdateLock) {
+    leaderReplicaIfLocal match {
+      case Some(leaderReplica) =>
+        val outOfSyncReplicas = getOutOfSyncReplicas(leaderReplica, replicaMaxLagTimeMs)
+        if(outOfSyncReplicas.nonEmpty) {
+          ...
+          // update ISR in zk and in cache
+          updateIsr(newInSyncReplicas)
+          ...
+        }
+
+      case None => false // do nothing if no longer leader
+    }
+  }
+
+  // some delayed operations may be unblocked after HW changed
+  if (leaderHWIncremented)
+    tryCompleteDelayedRequests()
+}
+
+def recordIsrChange(topicPartition: TopicPartition) {
+  isrChangeSet synchronized {
+    isrChangeSet += topicPartition
+    lastIsrChangeMs.set(System.currentTimeMillis())
+  }
+}
+
+def maybePropagateIsrChanges() {
+  val now = System.currentTimeMillis()
+  isrChangeSet synchronized {
+    if (isrChangeSet.nonEmpty &&
+      (lastIsrChangeMs.get() + ReplicaManager.IsrChangePropagationBlackOut < now ||
+        lastIsrPropagationMs.get() + ReplicaManager.IsrChangePropagationInterval < now)) {
+      ReplicationUtils.propagateIsrChanges(zkUtils, isrChangeSet)
+      isrChangeSet.clear()
+      lastIsrPropagationMs.set(now)
+    }
+  }
+}
+```
+controller在onControllerFailover的registerIsrChangeNotificationListener对上面的地址进行了监听。
+```
+private def registerIsrChangeNotificationListener() = {
+  debug("Registering IsrChangeNotificationListener")
+  zkUtils.subscribeChildChanges(ZkUtils.IsrChangeNotificationPath, isrChangeNotificationListener)
+}
+```
+controller根据leaderAndIsr的内容分享向相关的所有的broker发送LeaderAndIsr请求
+```
+case class IsrChangeNotification(sequenceNumbers: Seq[String]) extends ControllerEvent {
+
+  def state = ControllerState.IsrChange
+
+  override def process(): Unit = {
+    if (!isActive) return
+    try {
+      val topicAndPartitions = sequenceNumbers.flatMap(getTopicAndPartition).toSet
+      if (topicAndPartitions.nonEmpty) {
+        updateLeaderAndIsrCache(topicAndPartitions)
+        processUpdateNotifications(topicAndPartitions)
+      }
+    } finally {
+      // delete the notifications
+      sequenceNumbers.map(x => controllerContext.zkUtils.deletePath(ZkUtils.IsrChangeNotificationPath + "/" + x))
+    }
+  }
+
+  ...
+}
+```
+
+
+收到了controller发来的LeaderAndIsr请求，每个broker根据自身情况，让自己的ReplicaManager调用asLeader或者asFollower的响应
+```
+def becomeLeaderOrFollower(correlationId: Int,
+                            leaderAndISRRequest: LeaderAndIsrRequest,
+                            onLeadershipChange: (Iterable[Partition], Iterable[Partition]) => Unit): BecomeLeaderOrFollowerResult = {
+  leaderAndISRRequest.partitionStates.asScala.foreach { case (topicPartition, stateInfo) =>
+    stateChangeLogger.trace(s"Received LeaderAndIsr request $stateInfo " +
+      s"correlation id $correlationId from controller ${leaderAndISRRequest.controllerId} " +
+      s"epoch ${leaderAndISRRequest.controllerEpoch} for partition $topicPartition")
+  }
+  replicaStateChangeLock synchronized {
+    ...
+    val partitionsBecomeLeader = if (partitionsTobeLeader.nonEmpty)
+      makeLeaders(controllerId, controllerEpoch, partitionsTobeLeader, correlationId, responseMap)
+    else
+      Set.empty[Partition]
+    val partitionsBecomeFollower = if (partitionsToBeFollower.nonEmpty)
+      makeFollowers(controllerId, controllerEpoch, partitionsToBeFollower, correlationId, responseMap)
+    else
+      Set.empty[Partition]
+    ...
+  }
+}
+```
 
 ### Kafka中有哪些Coordinator?
 
