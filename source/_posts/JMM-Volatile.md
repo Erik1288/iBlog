@@ -9,3 +9,30 @@ tags:
 
 ### 怎么写一个正确的DCL（单例）？
 http://wuchong.me/blog/2014/08/28/how-to-correctly-write-singleton-pattern/
+
+### ArrayBlockingQueue中的这段代码和注释是什么意思？
+lock.lock(); // Lock only for visibility, not mutual exclusion
+```
+public ArrayBlockingQueue(int capacity, boolean fair,
+                            Collection<? extends E> c) {
+    this(capacity, fair);
+
+    final ReentrantLock lock = this.lock;
+    lock.lock(); // Lock only for visibility, not mutual exclusion
+    try {
+        int i = 0;
+        try {
+            for (E e : c) {
+                checkNotNull(e);
+                items[i++] = e;
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException();
+        }
+        count = i;
+        putIndex = (i == capacity) ? 0 : i;
+    } finally {
+        lock.unlock();
+    }
+}
+```
