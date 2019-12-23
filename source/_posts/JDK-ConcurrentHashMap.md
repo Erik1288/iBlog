@@ -23,6 +23,19 @@ if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {
 }
 ```
 
+### HashMap是怎么进行扩容的？
+作者：自闭玩家
+链接：https://www.nowcoder.com/discuss/176593?type=2&order=0&pos=11&page=1
+来源：牛客网
+
+讲了一下hashMap, 结构和插入，然后问我插入会有resize
+
+问我resize是直接原数组还是新数组(我说新的
+
+然后问我插入的情况下，resize，数据量很大的话，后面讲了map的二进制优化这些，插入是不是很慢(是喽
+
+然后问我有没有优化的方式(我说redis的map扩容优化，就是有个计数器，保证前面的已经resize了..
+
 ### ConcurrentHashMap内部是一个volatile Node[]实现的，那么多线程获取数组的引用时，确实是达到了volatile的效果，但是多线程想要去获取数组Node[]的某一个元素时，怎么能保证每个线程看到的是最新的值？
 ```
 /*

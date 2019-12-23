@@ -16,6 +16,8 @@ https://juejin.im/post/5ddf5659518825782d599641?utm_source=gold_browser_extensio
 
 ### Kafka能不能保证消费顺序？
 
+### Consumer消费2个Partition，两个partition都有大量的数量，如果Poll的时候取500条，那么取到的是第一个partition的消息，还是第二个，还有两个都有？某一个会不会被饿死？
+
 ### Kafka写CommitLog时用了什么锁机制?
 
 sync;lock-free;reentrant lock,用了哪一种？

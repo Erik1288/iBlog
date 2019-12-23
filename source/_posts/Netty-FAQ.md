@@ -18,8 +18,8 @@ https://www.jianshu.com/p/73fff8e09fed
 
 ### Netty PooledByteBufAllocator会创建多大的堆外内存？
 
-
-
+### Netty堆外内存池和堆内内存池，到底要选哪个？
+堆外是否一定比堆内快？
 
 ### 重要概念 Future and Promise
 
